@@ -45,7 +45,7 @@
     "env-novomundo",
     "lbplay"
   ],
-  "LIVE_TV_API_BASE": "https://api.reidoscanais.my",
+  "LIVE_TV_API_BASE": "https://api.reidoscanais.im",
   "LIVE_TV_CACHE_MS": "300000",
   "LIVE_TV_RESOLVE_CACHE_MS": "600000",
   "LIVE_TV_MAX_CAPTURE_PAGES": "8",
