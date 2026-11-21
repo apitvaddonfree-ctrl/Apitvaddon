@@ -1,0 +1,16 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "IracemaFlix TV API", "version": "1.0.0", "description": "Catálogo de canais, integração opcional com Xtream e EPG XMLTV." },
+  "servers": [{ "url": "https://SEU-HOST-TV" }],
+  "components": { "securitySchemes": { "BearerAuth": { "type": "http", "scheme": "bearer" } } },
+  "security": [{ "BearerAuth": [] }],
+  "paths": {
+    "/healthz": { "get": { "security": [], "summary": "Healthcheck", "responses": { "200": { "description": "Serviço ativo" } } } },
+    "/openapi.json": { "get": { "security": [], "summary": "Esta especificação", "responses": { "200": { "description": "OpenAPI JSON" } } } },
+    "/api/v1/categories": { "get": { "summary": "Categorias locais de canais", "responses": { "200": { "description": "Categorias" } } } },
+    "/api/v1/channels": { "get": { "summary": "Listar e filtrar canais locais e Xtream", "parameters": [{ "name": "source", "in": "query", "schema": { "type": "string", "enum": ["all", "embedtv", "xtream"] } }, { "name": "search", "in": "query", "schema": { "type": "string" } }, { "name": "categoryId", "in": "query", "schema": { "type": "string" } }, { "name": "limit", "in": "query", "schema": { "type": "integer", "maximum": 500 } }], "responses": { "200": { "description": "Canais normalizados" }, "502": { "description": "Fonte Xtream indisponível" } } } },
+    "/api/v1/channels/{id}": { "get": { "summary": "Consultar canal por ID", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "Dados do canal" }, "404": { "description": "Canal inexistente" } } } },
+    "/api/v1/epg": { "get": { "summary": "Consultar canais e programação XMLTV", "parameters": [{ "name": "channelId", "in": "query", "schema": { "type": "string" } }, { "name": "limit", "in": "query", "schema": { "type": "integer", "maximum": 500 } }], "responses": { "200": { "description": "EPG normalizado" }, "502": { "description": "Fontes EPG indisponíveis" } } } },
+    "/api/v1/live-tv/health": { "get": { "summary": "Estado do catálogo, EPG e integração Xtream", "responses": { "200": { "description": "Estado do serviço" } } } }
+  }
+}
