@@ -6,248 +6,196 @@ const path = require('node:path');
 const { XMLParser } = require('fast-xml-parser');
 const { configureHttp, clampInt, safeHttpUrl } = require('./http.cjs');
 
+const CONFIG_DIR = path.join(__dirname, 'config');
+const APP_CONFIG_FILE = path.join(CONFIG_DIR, 'app-config.json');
+const EPG_CONFIG_FILE = path.join(CONFIG_DIR, 'epg.json');
 const CHANNELS_DEFAULT = path.join(__dirname, 'data', 'embedTV.json');
 const XML_PARSER = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '@_', textNodeName: '#text', parseTagValue: false, trimValues: true });
 
+function readJson(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
+function readAppConfig(file = APP_CONFIG_FILE) { return readJson(file); }
 function readChannelData(filename = CHANNELS_DEFAULT) {
-  const parsed = JSON.parse(fs.readFileSync(filename, 'utf8'));
+  const parsed = readJson(filename);
   if (!Array.isArray(parsed.channels)) throw new Error('O catálogo de canais precisa conter channels[].');
   return parsed;
 }
-
-function loadEpgSources(env = process.env) {
-  let sources = [];
-  const raw = String(env.EPG_SOURCES_JSON || '[]');
-  try { sources = JSON.parse(raw); } catch { throw new Error('EPG_SOURCES_JSON deve conter um array JSON válido.'); }
-  if (!Array.isArray(sources) || sources.length > 10) throw new Error('EPG_SOURCES_JSON deve ter no máximo 10 fontes.');
+function resolveChannelsFile(config, explicit) {
+  if (explicit) return explicit;
+  const configured = String(config.EMBEDTV_FALLBACK_FILE || '').trim();
+  if (configured) {
+    const candidate = path.resolve(__dirname, configured);
+    const relative = path.relative(__dirname, candidate);
+    if (relative && !relative.startsWith('..') && !path.isAbsolute(relative) && fs.existsSync(candidate)) return candidate;
+  }
+  return CHANNELS_DEFAULT;
+}
+function loadEpgSources(file = EPG_CONFIG_FILE) {
+  const sources = readJson(file);
+  if (!Array.isArray(sources) || sources.length > 10) throw new Error('config/epg.json deve ter no máximo 10 fontes.');
   return sources.map((entry, index) => {
-    const urlValue = typeof entry === 'string' ? entry : entry?.url;
-    const url = safeHttpUrl(urlValue, `fonte EPG ${index + 1}`);
+    const url = safeHttpUrl(typeof entry === 'string' ? entry : entry?.url, `fonte EPG ${index + 1}`);
     return { id: String(entry?.id || `epg-${index + 1}`).slice(0, 64), url: url.toString() };
   });
 }
-
 function textValue(value) {
   if (Array.isArray(value)) return textValue(value[0]);
   if (value && typeof value === 'object') return String(value['#text'] || value.value || '');
   return String(value || '');
 }
-
 function asArray(value) { return value == null ? [] : Array.isArray(value) ? value : [value]; }
-
 function xmltvTime(value) {
   const match = String(value || '').trim().match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(?:\s*([+-])(\d{2})(\d{2}))?$/);
   if (!match) return null;
   const [, y, mo, d, h, mi, s, sign, offH, offM] = match;
-  const local = Date.UTC(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s));
-  const offset = sign ? (Number(offH) * 60 + Number(offM)) * 60_000 * (sign === '+' ? 1 : -1) : 0;
+  const local = Date.UTC(+y, +mo - 1, +d, +h, +mi, +s);
+  const offset = sign ? (+offH * 60 + +offM) * 60000 * (sign === '+' ? 1 : -1) : 0;
   return new Date(local - offset).toISOString();
 }
-
 function parseEpgXml(xml, sourceId) {
-  const parsed = XML_PARSER.parse(xml);
-  const root = parsed?.tv || {};
-  const channels = asArray(root.channel).map((channel) => ({
-    id: String(channel?.['@_id'] || '').slice(0, 200),
-    name: textValue(channel?.['display-name']) || String(channel?.['@_id'] || '').slice(0, 200),
-    sourceId
-  })).filter((channel) => channel.id);
-  const programmes = asArray(root.programme).map((programme) => ({
-    channel: String(programme?.['@_channel'] || '').slice(0, 200),
-    start: xmltvTime(programme?.['@_start']),
-    stop: xmltvTime(programme?.['@_stop']),
-    title: textValue(programme?.title).slice(0, 300),
-    description: textValue(programme?.desc).slice(0, 3000),
-    category: textValue(programme?.category).slice(0, 120),
-    sourceId
-  })).filter((item) => item.channel && item.start && item.title);
+  const root = XML_PARSER.parse(xml)?.tv || {};
+  const channels = asArray(root.channel).map((c) => ({ id: String(c?.['@_id'] || '').slice(0, 200), name: textValue(c?.['display-name']) || String(c?.['@_id'] || '').slice(0, 200), sourceId })).filter((c) => c.id);
+  const programmes = asArray(root.programme).map((p) => ({ channel: String(p?.['@_channel'] || '').slice(0, 200), start: xmltvTime(p?.['@_start']), stop: xmltvTime(p?.['@_stop']), title: textValue(p?.title).slice(0, 300), description: textValue(p?.desc).slice(0, 3000), category: textValue(p?.category).slice(0, 120), sourceId })).filter((p) => p.channel && p.start && p.title);
   return { channels, programmes };
 }
-
 function mapStaticChannel(channel) {
   let sourceUrl = '';
-  try {
-    const parsed = safeHttpUrl(channel.url, 'URL do canal');
-    sourceUrl = parsed.toString();
-  } catch { /* entradas sem URL válida permanecem visíveis, mas sem destino */ }
-  return {
-    id: String(channel.id || ''),
-    name: String(channel.name || '').slice(0, 200),
-    image: String(channel.image || '').slice(0, 2000),
-    preview: String(channel.preview || '').slice(0, 2000),
-    categories: Array.isArray(channel.categories) ? channel.categories : [],
-    categoryNames: Array.isArray(channel.categoryNames) ? channel.categoryNames.map(String) : [],
-    source: 'embedtv',
-    sourceUrl,
-    playbackMode: 'external-page'
-  };
+  try { sourceUrl = safeHttpUrl(channel.url, 'URL do canal').toString(); } catch { /* catálogo ainda pode exibir o canal */ }
+  return { id: String(channel.id || ''), name: String(channel.name || '').slice(0, 200), image: String(channel.image || '').slice(0, 2000), preview: String(channel.preview || '').slice(0, 2000), categories: Array.isArray(channel.categories) ? channel.categories : [], categoryNames: Array.isArray(channel.categoryNames) ? channel.categoryNames.map(String) : [], source: 'embedtv', sourceUrl, playbackMode: 'external-page' };
+}
+function arrayPayload(payload, keys = ['channels', 'events', 'sports', 'results', 'items']) {
+  if (Array.isArray(payload)) return payload;
+  for (const key of keys) if (Array.isArray(payload?.[key])) return payload[key];
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (payload?.data && typeof payload.data === 'object') return arrayPayload(payload.data, keys);
+  return [];
+}
+function mapEmbedChannels(payload) {
+  const categoryNames = new Map((Array.isArray(payload?.categories) ? payload.categories : []).map((item) => [String(item.id), String(item.name || item.title || '')]));
+  return arrayPayload(payload).map((channel) => {
+    const categories = (Array.isArray(channel.categories) ? channel.categories : []).map((category) => {
+      if (category && typeof category === 'object') return String(category.name || category.title || category.id || '');
+      return categoryNames.get(String(category)) || String(category || '');
+    }).filter(Boolean);
+    const mapped = mapStaticChannel({
+      id: channel.id,
+      name: channel.name || channel.title,
+      image: channel.image || channel.logo,
+      preview: channel.preview,
+      categories,
+      categoryNames: categories,
+      url: channel.url || channel.sourceUrl || channel.href
+    });
+    const normalized = `${mapped.id} ${mapped.name}`.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (!mapped.id || !mapped.sourceUrl || /\b(playboy|sexyhot)\b/.test(normalized)) return null;
+    return { ...mapped, playbackMode: /\.m3u8(?:$|\?)/i.test(mapped.sourceUrl) ? 'hls' : 'external-page' };
+  }).filter(Boolean);
 }
 
-function createApp({ env = process.env, fetchImpl = globalThis.fetch, channelsFile = env.TV_CHANNELS_FILE || CHANNELS_DEFAULT } = {}) {
-  const app = express();
-  const channelData = readChannelData(channelsFile);
-  const staticChannels = channelData.channels.map(mapStaticChannel).filter((channel) => channel.id);
+function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FILE, epgConfigFile = EPG_CONFIG_FILE, channelsFile = null } = {}) {
+  const config = readAppConfig(appConfigFile);
+  const localChannelsFile = resolveChannelsFile(config, channelsFile);
+  const channelData = readChannelData(localChannelsFile);
+  const staticChannels = channelData.channels.map(mapStaticChannel).filter((c) => c.id);
   const staticCategories = Array.isArray(channelData.categories) ? channelData.categories : [];
-  const epgSources = loadEpgSources(env);
-  const xtreamBase = env.XTREAM_API_BASE_URL ? safeHttpUrl(env.XTREAM_API_BASE_URL, 'XTREAM_API_BASE_URL').toString().replace(/\/+$/, '') : '';
-  const xtreamKey = String(env.XTREAM_API_KEY || '');
-  const timeoutMs = clampInt(env.UPSTREAM_TIMEOUT_MS, 10_000, 1_000, 20_000);
-  const epgCacheMs = clampInt(env.EPG_CACHE_MS, 300_000, 0, 3_600_000);
+  const epgSources = loadEpgSources(epgConfigFile);
+  const liveBase = safeHttpUrl(config.LIVE_TV_API_BASE, 'LIVE_TV_API_BASE').toString().replace(/\/+$/, '');
+  const embedBase = safeHttpUrl(config.EMBEDTV_API_BASE, 'EMBEDTV_API_BASE').toString().replace(/\/+$/, '');
+  const timeoutMs = clampInt(config.DIRECT_PROVIDER_API_TIMEOUT_MS || config.PROVIDER_SOURCE_TIMEOUT_MS, 25000, 1000, 120000);
+  const cacheMs = clampInt(config.LIVE_TV_CACHE_MS, 300000, 0, 3600000);
+  let liveCache = new Map();
+  let embedCache = new Map();
   let epgCache = null;
   let epgInFlight = null;
-  let xtreamCache = null;
 
-  configureHttp(app, 'iracemaflix-tv-api', env, { rateLimit: 60 });
-  app.use('/api/v1', express.json({ limit: '16kb', strict: true }));
+  const app = express();
+  configureHttp(app, 'iracemaflix-tv-api', { rateLimit: 60 });
   app.get('/openapi.json', (_req, res) => res.type('application/json').sendFile(path.join(__dirname, 'openapi.json')));
 
-  async function fetchWithTimeout(url, options = {}, consume = async (response) => response) {
+  async function upstream(base, endpoint, headers = {}) {
+    const url = new URL(endpoint, `${base}/`);
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    timer.unref?.();
+    const timer = setTimeout(() => controller.abort(), timeoutMs); timer.unref?.();
     try {
-      const response = await fetchImpl(url, { ...options, signal: controller.signal });
-      return await consume(response);
-    }
-    finally { clearTimeout(timer); }
-  }
-
-  async function fetchXtreamLive(force = false) {
-    if (!xtreamBase) throw Object.assign(new Error('Integração Xtream não configurada.'), { status: 503 });
-    if (!force && xtreamCache && xtreamCache.expiresAt > Date.now()) return xtreamCache.items;
-    const url = new URL('/api/v1/catalog/live?limit=500', `${xtreamBase}/`);
-    const headers = { Accept: 'application/json' };
-    if (xtreamKey) headers.Authorization = `Bearer ${xtreamKey}`;
-    const body = await fetchWithTimeout(url, { headers }, async (response) => {
-      if (!response.ok) throw new Error('API Xtream indisponível');
+      const response = await fetchImpl(url, { headers: { accept: 'application/json, text/plain, */*', 'user-agent': 'IracemaTV/1.5.5', ...headers }, signal: controller.signal });
+      if (!response.ok) throw new Error(`upstream HTTP ${response.status}`);
       const text = await response.text();
-      if (Buffer.byteLength(text, 'utf8') > 10 * 1024 * 1024) throw new Error('Resposta da API Xtream muito grande');
-      try { return JSON.parse(text); } catch { throw new Error('Resposta inválida da API Xtream'); }
-    });
-    if (!Array.isArray(body?.items)) throw new Error('Resposta inválida da API Xtream');
-    const items = body.items.map((item) => ({
-      id: `xtream:${String(item.sourceId || 'source')}:${String(item.id || '')}`,
-      name: String(item.name || '').slice(0, 200),
-      image: String(item.image || '').slice(0, 2000),
-      categoryId: String(item.categoryId || ''),
-      source: 'xtream',
-      sourceId: String(item.sourceId || ''),
-      playbackPath: item.playbackPath ? new URL(String(item.playbackPath), `${xtreamBase}/`).toString() : '',
-      playbackMode: 'xtream-redirect'
-    })).filter((item) => item.name && item.id);
-    xtreamCache = { items, expiresAt: Date.now() + 30_000 };
-    return items;
+      return JSON.parse(text);
+    } finally { clearTimeout(timer); }
   }
-
-  async function fetchEpg(force = false) {
-    if (!epgSources.length) return { configured: false, channels: [], programmes: [], failedSources: [] };
-    if (!force && epgCache && epgCache.expiresAt > Date.now()) return epgCache.value;
-    if (epgInFlight) return epgInFlight;
-    epgInFlight = (async () => {
-      const outcomes = await Promise.all(epgSources.map(async (source) => {
-        try {
-          const data = await fetchWithTimeout(source.url, { headers: { Accept: 'application/xml,text/xml,*/*' } }, async (response) => {
-            if (!response.ok) throw new Error('upstream');
-            const contentLength = Number(response.headers.get('content-length') || 0);
-            if (contentLength > 25 * 1024 * 1024) throw new Error('payload grande');
-            const xml = await response.text();
-            if (Buffer.byteLength(xml, 'utf8') > 25 * 1024 * 1024) throw new Error('payload grande');
-            return parseEpgXml(xml, source.id);
-          });
-          return { id: source.id, data };
-        } catch { return { id: source.id, failed: true }; }
-      }));
-      const failedSources = outcomes.filter((item) => item.failed).map((item) => item.id);
-      const successful = outcomes.filter((item) => item.data);
-      const channels = successful.flatMap((item) => item.data.channels);
-      const seen = new Set();
-      const programmes = successful.flatMap((item) => item.data.programmes).filter((item) => {
-        const key = `${item.channel}|${item.start}|${item.title}`;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-      const value = { configured: true, channels, programmes, failedSources };
-      if (epgCacheMs > 0 && successful.length) epgCache = { value, expiresAt: Date.now() + epgCacheMs };
+  async function cached(key, loader) {
+    const hit = liveCache.get(key); if (hit && hit.expires > Date.now()) return hit.value;
+    const value = await loader(); if (cacheMs > 0) liveCache.set(key, { value, expires: Date.now() + cacheMs });
+    return value;
+  }
+  async function embed(pathname) {
+    const hit = embedCache.get(pathname); if (hit && hit.expires > Date.now()) return hit.value;
+    try {
+      const value = await upstream(embedBase, pathname, { referer: String(config.EMBEDTV_SOURCE_REFERER || 'https://embedtv.cc/') });
+      if (cacheMs > 0) embedCache.set(pathname, { value, expires: Date.now() + cacheMs });
       return value;
-    })();
+    } catch (error) {
+      if (pathname === '/api/channels') {
+        const fallback = readChannelData(localChannelsFile);
+        if (cacheMs > 0) embedCache.set(pathname, { value: fallback, expires: Date.now() + cacheMs });
+        return fallback;
+      }
+      throw error;
+    }
+  }
+  async function getEmbedChannels() {
+    return mapEmbedChannels(await embed('/api/channels'));
+  }
+  async function fetchEpg(force = false) {
+    if (!force && epgCache && epgCache.expires > Date.now()) return epgCache.value;
+    if (epgInFlight) return epgInFlight;
+    epgInFlight = Promise.all(epgSources.map(async (source) => {
+      try { return { id: source.id, data: await upstream(source.url, '', { accept: 'application/xml,text/xml,*/*' }).catch(async () => { throw new Error('EPG upstream'); }) }; } catch { return { id: source.id, failed: true }; }
+    })).then((outcomes) => {
+      // XMLTV sources are fetched separately because upstream() parses JSON; use the same timeout policy.
+      return Promise.all(outcomes.map(async (item) => item));
+    }).then((outcomes) => {
+      const value = { configured: true, channels: [], programmes: [], failedSources: outcomes.filter((x) => x.failed).map((x) => x.id) };
+      if (cacheMs > 0) epgCache = { value, expires: Date.now() + cacheMs }; return value;
+    });
     try { return await epgInFlight; } finally { epgInFlight = null; }
+  }
+  // XMLTV fetcher kept separate from JSON upstreams.
+  async function fetchXml(source) {
+    const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), timeoutMs); timer.unref?.();
+    try { const response = await fetchImpl(source.url, { headers: { accept: 'application/xml,text/xml,*/*' }, signal: controller.signal }); if (!response.ok) throw new Error('upstream'); return parseEpgXml(await response.text(), source.id); } finally { clearTimeout(timer); }
+  }
+  async function loadEpg(force = false) {
+    if (!force && epgCache && epgCache.expires > Date.now()) return epgCache.value;
+    const results = await Promise.all(epgSources.map(async (s) => { try { return { id: s.id, data: await fetchXml(s) }; } catch { return { id: s.id, failed: true }; } }));
+    const seen = new Set(); const value = { configured: true, channels: results.flatMap((r) => r.data?.channels || []), programmes: results.flatMap((r) => r.data?.programmes || []).filter((p) => { const k = `${p.channel}|${p.start}|${p.title}`; if (seen.has(k)) return false; seen.add(k); return true; }), failedSources: results.filter((r) => r.failed).map((r) => r.id) };
+    if (cacheMs > 0) epgCache = { value, expires: Date.now() + cacheMs }; return value;
   }
 
   app.get('/api/v1/categories', (_req, res) => res.json({ categories: staticCategories }));
-
   app.get('/api/v1/channels', async (req, res) => {
-    const source = String(req.query.source || 'all').toLowerCase();
-    if (!['all', 'embedtv', 'xtream'].includes(source)) return res.status(400).json({ error: 'source deve ser all, embedtv ou xtream', requestId: req.requestId });
-    const search = String(req.query.search || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-    const category = String(req.query.categoryId || '');
-    const staticItems = source === 'xtream' ? [] : staticChannels.filter((item) => {
-      const matchesSearch = !search || item.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(search);
-      const matchesCategory = !category || item.categories.some((value) => String(value) === category);
-      return matchesSearch && matchesCategory;
-    });
-    let xtreamItems = [];
-    let xtreamError = '';
-    if (source === 'xtream' || (source === 'all' && xtreamBase)) {
-      try { xtreamItems = (await fetchXtreamLive()).filter((item) => !search || item.name.toLowerCase().includes(search)); }
-      catch (error) {
-        xtreamError = error.status === 503 ? error.message : 'API Xtream indisponível';
-        if (source === 'xtream') return res.status(error.status || 502).json({ error: xtreamError, requestId: req.requestId });
-      }
-    }
-    const items = [...staticItems, ...xtreamItems];
-    const limit = clampInt(req.query.limit, 200, 1, 500);
-    const offset = clampInt(req.query.offset, 0, 0, 1_000_000);
-    res.json({ items: items.slice(offset, offset + limit), total: items.length, offset, limit, partial: Boolean(xtreamError), ...(xtreamError ? { warnings: [xtreamError] } : {}) });
-  });
-
-  app.get('/api/v1/channels/:id', async (req, res) => {
-    const id = String(req.params.id || '');
-    if (id.startsWith('xtream:')) {
-      try {
-        const item = (await fetchXtreamLive()).find((channel) => channel.id === id);
-        return item ? res.json(item) : res.status(404).json({ error: 'Canal não encontrado', requestId: req.requestId });
-      } catch (error) { return res.status(error.status || 502).json({ error: error.status === 503 ? error.message : 'API Xtream indisponível', requestId: req.requestId }); }
-    }
-    const item = staticChannels.find((channel) => channel.id === id);
-    if (!item) return res.status(404).json({ error: 'Canal não encontrado', requestId: req.requestId });
-    res.json(item);
-  });
-
-  app.get('/api/v1/epg', async (req, res) => {
     try {
-      const epg = await fetchEpg(String(req.query.refresh || '') === '1');
-      const channelId = String(req.query.channelId || '');
-      const limit = clampInt(req.query.limit, 200, 1, 500);
-      const channels = channelId ? epg.channels.filter((item) => item.id === channelId) : epg.channels;
-      const programmes = epg.programmes.filter((item) => !channelId || item.channel === channelId)
-        .sort((a, b) => a.start.localeCompare(b.start)).slice(0, limit);
-      res.json({ configured: epg.configured, channels, programmes, failedSources: epg.failedSources });
-    } catch { res.status(502).json({ error: 'Não foi possível carregar o EPG', channels: [], programmes: [], requestId: req.requestId }); }
+      const source = String(req.query.source || 'all');
+      let items = [];
+      if (source === 'embedtv' || source === 'all') items = await getEmbedChannels();
+      if (source === 'live') items = arrayPayload(await cached('channels', () => upstream(liveBase, '/channels'))).map((x) => ({ ...x, source: 'live-tv', playbackMode: x.playbackMode || 'external-page' }));
+      if (!['all', 'embedtv', 'live'].includes(source)) return res.status(400).json({ error: 'source inválida', requestId: req.requestId });
+      const q = String(req.query.search || '').toLowerCase(); if (q) items = items.filter((x) => String(x.name || x.title || '').toLowerCase().includes(q));
+      const limit = clampInt(req.query.limit, 200, 1, 500); const offset = clampInt(req.query.offset, 0, 1000000);
+      res.json({ items: items.slice(offset, offset + limit), total: items.length, offset, limit });
+    } catch { res.status(502).json({ error: 'API de TV ao vivo indisponível', requestId: req.requestId }); }
   });
-
-  app.get('/api/v1/live-tv/health', (_req, res) => res.json({
-    ok: true,
-    staticChannels: staticChannels.length,
-    categories: staticCategories.length,
-    epgConfigured: epgSources.length > 0,
-    xtreamConfigured: Boolean(xtreamBase)
-  }));
-
-  app.use((req, res) => res.status(404).json({ error: 'Rota não encontrada', requestId: req.requestId }));
-  app.use((err, req, res, _next) => {
-    if (res.headersSent) return res.end();
-    const candidate = Number(err?.statusCode || err?.status);
-    const status = candidate >= 400 && candidate < 600 ? candidate : 500;
-    res.status(status).json({ error: status === 500 ? 'Erro interno do serviço' : String(err.message || 'Falha na requisição'), requestId: req?.requestId });
-  });
+  app.get('/api/v1/channels/:id', async (req, res) => { try { const item = (await getEmbedChannels()).find((x) => x.id === req.params.id); return item ? res.json(item) : res.status(404).json({ error: 'Canal não encontrado', requestId: req.requestId }); } catch { return res.status(502).json({ error: 'Catálogo de canais indisponível', requestId: req.requestId }); } });
+  app.get('/api/v1/sports', async (_req, res) => { try { res.json({ items: arrayPayload(await cached('sports', () => upstream(liveBase, '/sports')), ['sports', 'events', 'items']) }); } catch { res.status(502).json({ error: 'Eventos esportivos indisponíveis' }); } });
+  app.get('/api/v1/embedtv/events', async (_req, res) => { try { res.json({ items: arrayPayload(await embed('/api/events'), ['events', 'items', 'data']) }); } catch { res.status(502).json({ error: 'Eventos EmbedTV indisponíveis' }); } });
+  app.get('/api/v1/embedtv/epg', async (_req, res) => { try { res.json({ items: arrayPayload(await embed('/api/epg_all'), ['channels', 'data', 'items']) }); } catch { res.status(502).json({ error: 'EPG EmbedTV indisponível' }); } });
+  app.get('/api/v1/epg', async (req, res) => { try { const epg = await loadEpg(String(req.query.refresh || '') === '1'); const id = String(req.query.channelId || ''); res.json({ ...epg, channels: id ? epg.channels.filter((x) => x.id === id) : epg.channels, programmes: id ? epg.programmes.filter((x) => x.channel === id) : epg.programmes }); } catch { res.status(502).json({ error: 'Não foi possível carregar o EPG', channels: [], programmes: [] }); } });
+  app.get('/api/v1/live-tv/health', (_req, res) => res.json({ ok: true, staticChannels: staticChannels.length, categories: staticCategories.length, epgConfigured: epgSources.length > 0, liveTvConfigured: true, embedTvConfigured: true }));
+  app.use((_req, res) => res.status(404).json({ error: 'Rota não encontrada' }));
   return app;
 }
 
 if (require.main === module) {
-  const port = clampInt(process.env.PORT, 8080, 1, 65_535);
-  const app = createApp();
-  app.listen(port, '0.0.0.0', () => console.log(`[tv-api] listening on ${port}`));
+  const port = clampInt(readAppConfig().PORT, 7000, 1, 65535);
+  createApp().listen(port, '0.0.0.0', () => console.log(`[tv-api] listening on ${port}`));
 }
-
-module.exports = { createApp, readChannelData, loadEpgSources, parseEpgXml, xmltvTime, mapStaticChannel };
+module.exports = { createApp, readChannelData, readAppConfig, loadEpgSources, parseEpgXml, xmltvTime, mapStaticChannel };
