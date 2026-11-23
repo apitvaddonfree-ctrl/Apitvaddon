@@ -1,7 +1,7 @@
 {
   "PORT": "7000",
-  "M3U_URL": "./playlist-real-full.m3u",
-  "TMDB_API_KEY": "12a263eb78c5a66bf238a09bf48a413b",
+  "M3U_URL": "",
+  "TMDB_API_KEY": "",
   "TMDB_LANGUAGE": "pt-BR",
   "CONTENT_PROFILE": "clean",
   "CACHE_TTL_MS": "900000",
@@ -45,7 +45,7 @@
     "env-novomundo",
     "lbplay"
   ],
-  "LIVE_TV_API_BASE": "https://api.reidoscanais.im",
+  "LIVE_TV_API_BASE": "https://api.reidoscanais.my",
   "LIVE_TV_CACHE_MS": "300000",
   "LIVE_TV_RESOLVE_CACHE_MS": "600000",
   "LIVE_TV_MAX_CAPTURE_PAGES": "8",
@@ -61,75 +61,279 @@
   "EMBEDTV_FALLBACK_FILE": "./embedTV.json",
   "M3U_SOURCES": [
     {
-      "id": "smart-cms-central",
-      "name": "Smart CMS M3U",
-      "url": "http://smart.cms-central.ovh:80/get.php?username=Voana2025&password=Raquel2025&type=m3u_plus"
+      "id": "primary",
+      "name": "CDN4K",
+      "base": "http://cdn4k.live",
+      "username": "Claud091203",
+      "password": "eudb3irAe12"
     },
     {
-      "id": "murbax",
-      "name": "Murbax M3U",
-      "url": "http://murbax.com:80/get.php?username=dcruz08&password=9461Ms&type=m3u_plus"
+      "id": "anbinvlink",
+      "name": "Anbinvlink",
+      "base": "https://anbinvlink.fun",
+      "timeoutMs": 25000,
+      "username": "550756499349",
+      "password": "756987940655"
     },
     {
-      "id": "cerejadoce",
-      "name": "Cereja Doce M3U",
-      "url": "http://cerejadoce.live/get.php?username=Keber8420&password=Dwre4f73w&type=m3u_plus"
+      "id": "env-pfsv",
+      "name": "PFSV",
+      "base": "http://pfsv.io",
+      "username": "rodrigolobogf",
+      "password": "Hstv1020"
     },
     {
-      "id": "clbtw",
-      "name": "CLBTW M3U",
-      "url": "http://clbtw.net:80/get.php?username=jugatha2603&password=2251855Nux&type=m3u_plus&output=ts"
+      "id": "env-ua32tt",
+      "name": "UA32TT",
+      "base": "http://ua32tt.vip",
+      "username": "Carlindo02",
+      "password": "dmss493Y1"
     },
     {
-      "id": "masterflix",
-      "name": "MasterFlix M3U",
-      "url": "http://masterflix.vip:80/get.php?username=21984473386tv1&password=12345678Ab&type=m3u_plus&output=ts"
+      "id": "env-sitiomacaco",
+      "name": "Sítio Macaco",
+      "base": "http://sitiomacaco.com",
+      "username": "cSjxZcw8Q",
+      "password": "C1wBr5"
+    },
+    {
+      "id": "env-beleco",
+      "name": "Beleco",
+      "base": "http://beleco.ddns.net",
+      "username": "002894",
+      "password": "hejEm2"
+    },
+    {
+      "id": "env-novomundo",
+      "name": "Novo Mundo",
+      "base": "http://novomundo.live:80",
+      "username": "41625496",
+      "password": "52949419"
+    },
+    {
+      "id": "one-tv",
+      "name": "One TV",
+      "base": "http://one-tv.sbs",
+      "timeoutMs": 25000,
+      "username": "9a31d0691f",
+      "password": "c9090c45007e"
+    },
+    {
+      "id": "kasiner",
+      "name": "Kasiner",
+      "base": "http://kasiner.fun",
+      "username": "328525749768",
+      "password": "543695573463"
+    },
+    {
+      "id": "dvdplay2",
+      "name": "DVDPlay2",
+      "base": "http://dvdplay2.com",
+      "username": "047597",
+      "password": "un7yWp"
+    },
+    {
+      "id": "urlsync",
+      "name": "URLSync",
+      "base": "http://auth.urlsync.gy",
+      "username": "russo20",
+      "password": "5a6bqe1w2qq"
+    },
+    {
+      "id": "cms-central",
+      "name": "Smart CMS",
+      "base": "http://smart.cms-central.ovh:80",
+      "timeoutMs": 25000,
+      "username": "Voana2025",
+      "password": "Raquel2025"
+    },
+    {
+      "id": "5ce",
+      "name": "5CE",
+      "base": "http://5ce.me",
+      "timeoutMs": 25000,
+      "username": "982268151",
+      "password": "ativo1357"
+    },
+    {
+      "id": "oneplayfastpro",
+      "name": "OnePlayFastPro",
+      "base": "http://oneplayfastpro.xyz:80",
+      "username": "11234bth",
+      "password": "mrx38574"
+    },
+    {
+      "id": "elite-factory",
+      "name": "Elite Factory",
+      "base": "http://elite.factoryexcelencia.online",
+      "username": "0107641",
+      "password": "2355845"
+    },
+    {
+      "id": "cdnplay",
+      "name": "CDNPlay",
+      "base": "http://cdnplay.pro:80",
+      "username": "123456789",
+      "password": "123456789"
+    },
+    {
+      "id": "gigatvs",
+      "name": "Giga TVs",
+      "base": "http://gigatvs.com",
+      "timeoutMs": 25000,
+      "username": "asd97571830",
+      "password": "Zaptv2024"
+    },
+    {
+      "id": "clarotv",
+      "name": "Claro TV",
+      "base": "http://clarotv.org",
+      "timeoutMs": 25000,
+      "username": "asd97571830",
+      "password": "Zaptv2024"
+    },
+    {
+      "id": "lbplay",
+      "name": "LB Play",
+      "base": "http://lbplay.ddns.me",
+      "timeoutMs": 25000,
+      "username": "asd97571830",
+      "password": "Zaptv2024"
+    },
+    {
+      "id": "teleflixhd",
+      "name": "Teleflix HD",
+      "base": "http://teleflixhd.club",
+      "timeoutMs": 25000,
+      "username": "asd97571830",
+      "password": "Zaptv2024"
+    },
+    {
+      "id": "ultclub",
+      "name": "Ult Club",
+      "base": "http://ultclub.click",
+      "timeoutMs": 25000,
+      "username": "asd97571830",
+      "password": "Zaptv2024"
+    },
+    {
+      "id": "brasilplaytv",
+      "name": "Brasil Play TV",
+      "base": "http://brasilplaytv.com",
+      "timeoutMs": 25000,
+      "username": "asd97571830",
+      "password": "Zaptv2024"
+    },
+    {
+      "id": "afg154",
+      "name": "AFG154",
+      "base": "http://afg154.life",
+      "timeoutMs": 25000,
+      "username": "2517196817962",
+      "password": "1854172424814"
+    },
+    {
+      "id": "cdn4k-live-89625",
+      "name": "CDN4K.live 89625",
+      "base": "http://cdn4k.live:80",
+      "timeoutMs": 25000,
+      "username": "89625u16",
+      "password": "z17844a8"
+    },
+    {
+      "id": "cdn4k-live-aripai",
+      "name": "CDN4K.live Aripai",
+      "base": "http://cdn4k.live:80",
+      "timeoutMs": 25000,
+      "username": "aripai",
+      "password": "i2p4t6v10"
+    },
+    {
+      "id": "vaiagora",
+      "name": "Vai Agora",
+      "base": "http://vaiagora.vip:80",
+      "timeoutMs": 25000,
+      "username": "NinoCaique",
+      "password": "282TVWvdm"
+    },
+    {
+      "id": "4kplay",
+      "name": "4KPlay",
+      "base": "http://4kplay33.icu",
+      "timeoutMs": 25000,
+      "username": "76626mhc",
+      "password": "grw21928"
+    },
+    {
+      "id": "capyplay-xtream",
+      "name": "CapyPlay",
+      "base": "http://capyplay.space",
+      "timeoutMs": 25000,
+      "username": "797688011",
+      "password": "268968497"
     },
     {
       "id": "magnum-ott",
-      "name": "Magnum OTT M3U",
-      "url": "http://magnum-ott.net:80/get.php?username=846KF3ZM1495548&password=H9HqIOWiSn&type=m3u_plus&output=ts"
+      "name": "Magnum OTT",
+      "base": "http://magnum-ott.net",
+      "timeoutMs": 25000,
+      "username": "846KF3ZM1495548",
+      "password": "H9HqIOWiSn"
     },
     {
-      "id": "pfsv",
-      "name": "PFSV M3U",
-      "url": "http://pfsv.io:80/get.php?username=brunojeec2014&password=376971&type=m3u"
+      "id": "murbax",
+      "name": "Murbax",
+      "base": "http://murbax.com",
+      "timeoutMs": 25000,
+      "username": "dcruz08",
+      "password": "9461Ms"
+    },
+    {
+      "id": "cerejadoce",
+      "name": "Cereja Doce",
+      "base": "http://cerejadoce.live",
+      "timeoutMs": 25000,
+      "username": "Keber8420",
+      "password": "Dwre4f73w"
     },
     {
       "id": "claxys",
-      "name": "Claxys M3U",
-      "url": "http://claxys.info/get.php?username=ytallo00422&password=nJ38wP&type=m3u_plus&output=ts"
+      "name": "Claxys",
+      "base": "http://claxys.info",
+      "timeoutMs": 25000,
+      "username": "ytallo00422",
+      "password": "nJ38wP"
     },
     {
-      "id": "maquiavelv2",
-      "name": "Maquiavel V2 M3U",
-      "url": "http://maquiavelv2.shop/get.php?username=677189849&password=017521443&type=m3u_plus&output=ts"
+      "id": "azqkdk-xtream",
+      "name": "AZQKDK",
+      "base": "http://azqkdk.club",
+      "timeoutMs": 25000,
+      "username": "1705821282",
+      "password": "centralsegura"
     },
     {
-      "id": "lunarsv",
-      "name": "LunarSV M3U",
-      "url": "http://lunarsv.top/get.php?username=marciomuge&password=2658w5d2f3c5&type=m3u_plus"
+      "id": "clbtw",
+      "name": "CLBTW",
+      "base": "http://clbtw.net",
+      "timeoutMs": 25000,
+      "username": "jugatha2603",
+      "password": "2251855Nux"
     },
     {
-      "id": "flix-cdn700",
-      "name": "Flix CDN700 M3U",
-      "url": "http://flix.cdn700.sbs/get.php?username=Gabriel12&password=Gabriel12&type=m3u_plus"
-    },
-    {
-      "id": "capyplay",
-      "name": "CapyPlay M3U",
-      "url": "http://capyplay.space/get.php?username=797688011&password=268968497&type=m3u_plus"
-    },
-    {
-      "id": "azqkdk",
-      "name": "AZQKDK M3U",
-      "url": "http://azqkdk.club/get.php?username=1705821282&password=centralsegura&type=m3u_plus"
+      "id": "masterflix",
+      "name": "Masterflix",
+      "base": "http://masterflix.vip",
+      "timeoutMs": 25000,
+      "username": "21984473386tv1",
+      "password": "12345678Ab"
     }
   ],
   "PROVIDER_SOURCE_TIMEOUT_MS": 25000,
   "DIRECT_PROVIDER_API_TIMEOUT_MS": 25000,
   "XTREAM_IMDB_TIMEOUT_MS": 25000,
   "CHANNEL_XTREAM_TIMEOUT_MS": 25000,
+  "XTREAM_CONCURRENCY": 12,
   "CHANNEL_M3U_TIMEOUT_MS": 25000,
   "IMDB_M3U_TIMEOUT_MS": 25000,
   "EMBED_CANAIS_TIMEOUT_MS": 25000,
