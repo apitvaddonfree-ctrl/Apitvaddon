@@ -1,0 +1,18 @@
+[
+  {
+    "id": "claxys",
+    "name": "Claxys",
+    "base": "https://claxys.info",
+    "username": "SUBSTITUA_NO_RENDER",
+    "password": "SUBSTITUA_NO_RENDER",
+    "timeoutMs": 8000
+  },
+  {
+    "id": "outro-servidor",
+    "name": "Outro servidor",
+    "base": "https://iptv.example.invalid",
+    "username": "SUBSTITUA_NO_RENDER",
+    "password": "SUBSTITUA_NO_RENDER",
+    "timeoutMs": 8000
+  }
+]
