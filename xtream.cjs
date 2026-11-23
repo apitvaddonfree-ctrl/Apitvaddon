@@ -95,26 +95,55 @@ function applyXtreamCredentials(entries, credentials) {
   });
 }
 
+function isEnabledAndAuthenticated(entry) {
+  return entry?.enabled !== false && hasXtreamCredentials(entry);
+}
+
+function createXtreamError(code, httpStatus = null) {
+  const error = new Error('Xtream upstream request failed');
+  error.xtreamCode = code;
+  if (httpStatus) error.httpStatus = httpStatus;
+  return error;
+}
+
+function safeXtreamErrorCode(error) {
+  if (/^[A-Z0-9_]{1,48}$/.test(String(error?.xtreamCode || ''))) return error.xtreamCode;
+  if (error?.name === 'AbortError' || error?.name === 'TimeoutError') return 'TIMEOUT';
+  const causeCode = String(error?.cause?.code || '');
+  if (/^(EAI_AGAIN|ECONNREFUSED|ECONNRESET|ENOTFOUND|ETIMEDOUT|UND_ERR_CONNECT_TIMEOUT|UND_ERR_SOCKET)$/.test(causeCode)) return causeCode;
+  return 'NETWORK_ERROR';
+}
+
+function logXtream(logger, level, fields) {
+  try {
+    const method = logger?.[level];
+    if (typeof method === 'function') method.call(logger, `[xtream] ${JSON.stringify(fields)}`);
+  } catch { /* Logging must never interrupt catalog loading. */ }
+}
+
 function loadXtreamSources({ env = process.env, appConfig = {}, sourcesFile = null } = {}) {
+  const configuredM3U = Array.isArray(appConfig.M3U_SOURCES) ? appConfig.M3U_SOURCES : [];
+  const configuredXtream = Array.isArray(appConfig.XTREAM_SOURCES) ? appConfig.XTREAM_SOURCES : [];
+  const hasCredentialsInAppConfig = [...configuredM3U, ...configuredXtream].some(isEnabledAndAuthenticated);
+  const credentials = hasCredentialsInAppConfig ? new Map() : credentialsMapFromEnv(env);
+  const m3uSources = applyXtreamCredentials(configuredM3U, credentials);
+  const xtreamSources = applyXtreamCredentials(configuredXtream, credentials);
   let raw = null;
-  const credentials = credentialsMapFromEnv(env);
   const envSources = String(env.XTREAM_SOURCES_JSON || env.M3U_SOURCES_JSON || '').trim();
-  if (envSources) {
+  if (m3uSources.some(isEnabledAndAuthenticated)) {
+    raw = m3uSources;
+  } else if (xtreamSources.some(isEnabledAndAuthenticated)) {
+    raw = xtreamSources;
+  } else if (envSources) {
     try { raw = JSON.parse(envSources); }
     catch { throw new Error('XTREAM_SOURCES_JSON ou M3U_SOURCES_JSON precisa conter JSON válido.'); }
-  } else if (Array.isArray(appConfig.XTREAM_SOURCES)) {
-    raw = appConfig.XTREAM_SOURCES;
   } else {
-    const m3uSources = Array.isArray(appConfig.M3U_SOURCES) ? applyXtreamCredentials(appConfig.M3U_SOURCES, credentials) : [];
-    if (m3uSources.some(hasXtreamCredentials)) raw = m3uSources;
-    else {
-      const configuredFile = sourcesFile || appConfig.XTREAM_SOURCES_FILE;
-      if (configuredFile) {
-        const resolved = path.isAbsolute(String(configuredFile)) ? String(configuredFile) : path.resolve(__dirname, String(configuredFile));
-        if (fs.existsSync(resolved)) {
-          try { raw = JSON.parse(fs.readFileSync(resolved, 'utf8')); }
-          catch { throw new Error('O arquivo de fontes Xtream não contém JSON válido.'); }
-        }
+    const configuredFile = sourcesFile || appConfig.XTREAM_SOURCES_FILE;
+    if (configuredFile) {
+      const resolved = path.isAbsolute(String(configuredFile)) ? String(configuredFile) : path.resolve(__dirname, String(configuredFile));
+      if (fs.existsSync(resolved)) {
+        try { raw = JSON.parse(fs.readFileSync(resolved, 'utf8')); }
+        catch { throw new Error('O arquivo de fontes Xtream não contém JSON válido.'); }
       }
     }
   }
@@ -140,7 +169,7 @@ function cleanExtension(value) {
   return /^[a-z0-9]{1,8}$/.test(extension) ? extension : 'ts';
 }
 
-function createXtreamClient({ fetchImpl = globalThis.fetch, sources = [], cacheMs = 300000, concurrency = 4 } = {}) {
+function createXtreamClient({ fetchImpl = globalThis.fetch, sources = [], cacheMs = 300000, concurrency = 4, logger = console } = {}) {
   const cache = new Map();
   const maxConcurrent = clampInt(concurrency, 12, 1, 20);
   const ttlMs = clampInt(cacheMs, 300000, 0, 3600000);
@@ -152,18 +181,31 @@ function createXtreamClient({ fetchImpl = globalThis.fetch, sources = [], cacheM
     url.searchParams.set('action', action);
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), source.timeoutMs);
+    const startedAt = Date.now();
+    let httpStatus = null;
     timer.unref?.();
     try {
       const response = await fetchImpl(url, {
         headers: { accept: 'application/json', 'user-agent': source.userAgent },
         signal: controller.signal
       });
-      if (!response.ok) throw new Error(`upstream HTTP ${response.status}`);
+      httpStatus = response.status;
+      if (!response.ok) throw createXtreamError(`HTTP_${response.status}`, response.status);
       const text = await response.text();
       let payload;
       try { payload = JSON.parse(text); }
-      catch { throw new Error('resposta Xtream não é JSON'); }
+      catch { throw createXtreamError('INVALID_JSON', httpStatus); }
+      if (action === 'get_live_streams' && !Array.isArray(payload)) throw createXtreamError('INVALID_STREAMS_SHAPE', httpStatus);
+      if (action === 'get_live_categories' && !Array.isArray(payload)) {
+        logXtream(logger, 'warn', { event: 'xtream_request_failed', sourceId: source.id, action, code: 'INVALID_CATEGORIES_SHAPE', httpStatus, durationMs: Date.now() - startedAt });
+      } else {
+        logXtream(logger, 'info', { event: 'xtream_request_ok', sourceId: source.id, action, httpStatus, durationMs: Date.now() - startedAt, count: Array.isArray(payload) ? payload.length : null });
+      }
       return payload;
+    } catch (error) {
+      const code = safeXtreamErrorCode(error);
+      logXtream(logger, 'warn', { event: 'xtream_request_failed', sourceId: source.id, action, code, httpStatus: error?.httpStatus || httpStatus, durationMs: Date.now() - startedAt });
+      throw createXtreamError(code, error?.httpStatus || httpStatus);
     } finally { clearTimeout(timer); }
   }
 
@@ -174,7 +216,7 @@ function createXtreamClient({ fetchImpl = globalThis.fetch, sources = [], cacheM
     ]);
     if (streamsResult.status === 'rejected') throw streamsResult.reason;
     const rawStreams = streamsResult.value;
-    if (!Array.isArray(rawStreams)) throw new Error('get_live_streams não retornou uma lista.');
+    if (!Array.isArray(rawStreams)) throw createXtreamError('INVALID_STREAMS_SHAPE');
     const rawCategories = categoriesResult.status === 'fulfilled' && Array.isArray(categoriesResult.value)
       ? categoriesResult.value : [];
     const categoryNames = new Map(rawCategories.map((item) => [String(item.category_id ?? item.categoryId ?? ''), String(item.category_name || item.categoryName || item.name || '')]));
@@ -241,8 +283,8 @@ function createXtreamClient({ fetchImpl = globalThis.fetch, sources = [], cacheM
 
   async function getCatalog({ sourceId = '', force = false } = {}) {
     const chosen = sourceId ? sources.filter((source) => source.id === sourceId) : sources;
-    if (sourceId && !chosen.length) return { configured: sources.length > 0, items: [], categories: [], sources: [], failedSources: [sourceId], unknownSource: true };
-    if (!chosen.length) return { configured: false, items: [], categories: [], sources: [], failedSources: [] };
+    if (sourceId && !chosen.length) return { configured: sources.length > 0, items: [], categories: [], sources: [], failedSources: [sourceId], failedSourceDetails: [{ id: sourceId, code: 'UNKNOWN_SOURCE' }], unknownSource: true };
+    if (!chosen.length) return { configured: false, items: [], categories: [], sources: [], failedSources: [], failedSourceDetails: [] };
 
     const results = new Array(chosen.length);
     let cursor = 0;
@@ -252,12 +294,13 @@ function createXtreamClient({ fetchImpl = globalThis.fetch, sources = [], cacheM
         if (index >= chosen.length) return;
         const source = chosen[index];
         try { results[index] = await getSource(source, force); }
-        catch { results[index] = { source: publicSource(source), items: [], failed: true }; }
+        catch (error) { results[index] = { source: publicSource(source), items: [], failed: true, failureCode: safeXtreamErrorCode(error) }; }
       }
     }
     await Promise.all(Array.from({ length: Math.min(maxConcurrent, chosen.length) }, worker));
     const successful = results.filter((result) => !result.failed);
     const failedSources = results.filter((result) => result.failed).map((result) => result.source.id);
+    const failedSourceDetails = results.filter((result) => result.failed).map((result) => ({ id: result.source.id, code: result.failureCode }));
     const items = results.flatMap((result) => result.items || []);
     return {
       configured: true,
@@ -265,6 +308,7 @@ function createXtreamClient({ fetchImpl = globalThis.fetch, sources = [], cacheM
       categories: results.flatMap((result) => result.categories || []),
       sources: successful.map((result) => ({ ...result.source, count: result.items.length })),
       failedSources,
+      failedSourceDetails,
       partial: failedSources.length > 0
     };
   }
