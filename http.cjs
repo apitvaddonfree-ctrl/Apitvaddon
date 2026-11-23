@@ -12,7 +12,7 @@ function configureHttp(app, service, options = {}) {
     if (req.method === 'OPTIONS') return res.status(204).end();
     next();
   });
-  app.get('/healthz', (_req, res) => res.json({ ok: true, service, version: '1.0.0' }));
+  app.get('/healthz', (_req, res) => res.json({ ok: true, service, version: '1.1.0' }));
   app.use('/api/v1', (req, res, next) => {
     const now = Date.now(); const client = String(req.socket?.remoteAddress || 'unknown');
     const recent = (limits.get(client) || []).filter((t) => now - t < 60000);

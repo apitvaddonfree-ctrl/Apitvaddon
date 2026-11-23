@@ -1,17 +1,62 @@
 {
   "openapi": "3.1.0",
-  "info": { "title": "IracemaFlix TV API", "version": "1.0.0", "description": "Catálogo local EmbedTV, TV ao vivo pública e EPG XMLTV." },
+  "info": {
+    "title": "IracemaFlix TV API",
+    "version": "1.1.0",
+    "description": "Catálogo EmbedTV, TV ao vivo, fontes Xtream configuráveis e EPG XMLTV. Credenciais Xtream são carregadas no servidor e nunca retornadas nas respostas."
+  },
   "servers": [{ "url": "https://SEU-HOST-TV" }],
   "paths": {
-    "/healthz": { "get": { "summary": "Healthcheck", "responses": { "200": { "description": "Serviço ativo" } } } },
-    "/openapi.json": { "get": { "summary": "Esta especificação", "responses": { "200": { "description": "OpenAPI JSON" } } } },
-    "/api/v1/categories": { "get": { "summary": "Categorias locais de canais", "responses": { "200": { "description": "Categorias" } } } },
-    "/api/v1/channels": { "get": { "summary": "Listar canais locais ou da TV ao vivo pública", "parameters": [{ "name": "source", "in": "query", "schema": { "type": "string", "enum": ["all", "embedtv", "live"] } }, { "name": "search", "in": "query", "schema": { "type": "string" } }, { "name": "limit", "in": "query", "schema": { "type": "integer", "maximum": 500 } }], "responses": { "200": { "description": "Canais normalizados" }, "502": { "description": "Fonte upstream indisponível" } } } },
-    "/api/v1/channels/{id}": { "get": { "summary": "Consultar canal local por ID", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "Dados do canal" }, "404": { "description": "Canal inexistente" } } } },
-    "/api/v1/sports": { "get": { "summary": "Eventos esportivos públicos", "responses": { "200": { "description": "Eventos" }, "502": { "description": "Fonte upstream indisponível" } } } },
-    "/api/v1/embedtv/events": { "get": { "summary": "Eventos EmbedTV", "responses": { "200": { "description": "Eventos" } } } },
-    "/api/v1/embedtv/epg": { "get": { "summary": "EPG agregado EmbedTV", "responses": { "200": { "description": "EPG" } } } },
-    "/api/v1/epg": { "get": { "summary": "Consultar programação XMLTV configurada localmente", "parameters": [{ "name": "channelId", "in": "query", "schema": { "type": "string" } }, { "name": "refresh", "in": "query", "schema": { "type": "string" } }], "responses": { "200": { "description": "EPG normalizado" }, "502": { "description": "Fontes EPG indisponíveis" } } } },
-    "/api/v1/live-tv/health": { "get": { "summary": "Estado do catálogo, EPG e integrações", "responses": { "200": { "description": "Estado do serviço" } } } }
+    "/healthz": {
+      "get": { "summary": "Healthcheck do processo", "responses": { "200": { "description": "Serviço ativo" } } }
+    },
+    "/openapi.json": {
+      "get": { "summary": "Esta especificação", "responses": { "200": { "description": "OpenAPI JSON" } } }
+    },
+    "/api/v1/xtream/sources": {
+      "get": { "summary": "Fontes Xtream configuradas sem credenciais", "responses": { "200": { "description": "IDs e nomes das fontes configuradas" } } }
+    },
+    "/api/v1/categories": {
+      "get": {
+        "summary": "Categorias locais e Xtream",
+        "parameters": [
+          { "name": "source", "in": "query", "schema": { "type": "string", "enum": ["all", "embedtv", "xtream"] } },
+          { "name": "sourceId", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Categorias com contagem por fonte" }, "400": { "description": "Fonte inválida" } }
+      }
+    },
+    "/api/v1/channels": {
+      "get": {
+        "summary": "Listar canais EmbedTV, ao vivo e Xtream",
+        "parameters": [
+          { "name": "source", "in": "query", "schema": { "type": "string", "enum": ["all", "embedtv", "live", "xtream"] } },
+          { "name": "sourceId", "in": "query", "schema": { "type": "string" } },
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "category", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "maximum": 500 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "minimum": 0 } }
+        ],
+        "responses": { "200": { "description": "Canais normalizados; inclui fontes parciais/falhas sem credenciais" }, "400": { "description": "Fonte inválida" }, "404": { "description": "Fonte Xtream não configurada" }, "502": { "description": "Fonte upstream indisponível" } }
+      }
+    },
+    "/api/v1/channels/{id}": {
+      "get": { "summary": "Consultar canal local por ID", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "Dados do canal" }, "404": { "description": "Canal inexistente" } } }
+    },
+    "/api/v1/sports": {
+      "get": { "summary": "Eventos esportivos públicos", "responses": { "200": { "description": "Eventos" }, "502": { "description": "Fonte upstream indisponível" } } }
+    },
+    "/api/v1/embedtv/events": {
+      "get": { "summary": "Eventos EmbedTV", "responses": { "200": { "description": "Eventos" } } }
+    },
+    "/api/v1/embedtv/epg": {
+      "get": { "summary": "EPG agregado EmbedTV", "responses": { "200": { "description": "EPG" } } }
+    },
+    "/api/v1/epg": {
+      "get": { "summary": "Consultar programação XMLTV configurada localmente", "parameters": [{ "name": "channelId", "in": "query", "schema": { "type": "string" } }, { "name": "refresh", "in": "query", "schema": { "type": "string" } }], "responses": { "200": { "description": "EPG normalizado" }, "502": { "description": "Fontes EPG indisponíveis" } } }
+    },
+    "/api/v1/live-tv/health": {
+      "get": { "summary": "Estado do catálogo e fontes configuradas, sem validar disponibilidade upstream", "responses": { "200": { "description": "Estado do serviço" } } }
+    }
   }
 }

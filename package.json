@@ -1,8 +1,8 @@
 {
   "name": "iracemaflix-tv-api",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
-  "description": "Serviço independente de canais, TV ao vivo e EPG do IracemaFlix.",
+  "description": "Agregador de canais EmbedTV, TV ao vivo, fontes Xtream e EPG do IracemaFlix.",
   "main": "index.js",
   "scripts": { "start": "node index.js", "test": "node --test" },
   "engines": { "node": ">=22.19.0" },
