@@ -114,6 +114,20 @@ function safeXtreamErrorCode(error) {
   return 'NETWORK_ERROR';
 }
 
+function safeResponseMimeType(value) {
+  const mime = String(value || '').split(';', 1)[0].trim().toLowerCase();
+  return /^[a-z0-9!#$&^_.+-]+\/[a-z0-9!#$&^_.+-]+$/.test(mime) ? mime : 'unknown';
+}
+
+function classifyResponseBody(text, mime) {
+  const trimmed = String(text || '').trim();
+  if (!trimmed) return 'empty';
+  if (/^(?:<!doctype\s+html|<html\b)/i.test(trimmed) || mime === 'text/html') return 'html';
+  if (/^[\[{]/.test(trimmed) || mime.endsWith('/json') || mime.includes('+json')) return 'json_like_invalid';
+  if (trimmed.startsWith('<')) return 'markup';
+  return 'text';
+}
+
 function logXtream(logger, level, fields) {
   try {
     const method = logger?.[level];
@@ -183,6 +197,10 @@ function createXtreamClient({ fetchImpl = globalThis.fetch, sources = [], cacheM
     const timer = setTimeout(() => controller.abort(), source.timeoutMs);
     const startedAt = Date.now();
     let httpStatus = null;
+    let responseMime = 'unknown';
+    let responseBytes = null;
+    let responseKind = 'not_received';
+    let redirected = false;
     timer.unref?.();
     try {
       const response = await fetchImpl(url, {
@@ -190,21 +208,25 @@ function createXtreamClient({ fetchImpl = globalThis.fetch, sources = [], cacheM
         signal: controller.signal
       });
       httpStatus = response.status;
+      responseMime = safeResponseMimeType(response.headers?.get?.('content-type'));
+      redirected = Boolean(response.redirected);
       if (!response.ok) throw createXtreamError(`HTTP_${response.status}`, response.status);
       const text = await response.text();
+      responseBytes = Buffer.byteLength(text, 'utf8');
+      responseKind = classifyResponseBody(text, responseMime);
       let payload;
       try { payload = JSON.parse(text); }
       catch { throw createXtreamError('INVALID_JSON', httpStatus); }
       if (action === 'get_live_streams' && !Array.isArray(payload)) throw createXtreamError('INVALID_STREAMS_SHAPE', httpStatus);
       if (action === 'get_live_categories' && !Array.isArray(payload)) {
-        logXtream(logger, 'warn', { event: 'xtream_request_failed', sourceId: source.id, action, code: 'INVALID_CATEGORIES_SHAPE', httpStatus, durationMs: Date.now() - startedAt });
+        logXtream(logger, 'warn', { event: 'xtream_request_failed', sourceId: source.id, action, code: 'INVALID_CATEGORIES_SHAPE', httpStatus, durationMs: Date.now() - startedAt, responseMime, responseBytes, responseKind, redirected });
       } else {
-        logXtream(logger, 'info', { event: 'xtream_request_ok', sourceId: source.id, action, httpStatus, durationMs: Date.now() - startedAt, count: Array.isArray(payload) ? payload.length : null });
+        logXtream(logger, 'info', { event: 'xtream_request_ok', sourceId: source.id, action, httpStatus, durationMs: Date.now() - startedAt, count: Array.isArray(payload) ? payload.length : null, responseMime, responseBytes, responseKind, redirected });
       }
       return payload;
     } catch (error) {
       const code = safeXtreamErrorCode(error);
-      logXtream(logger, 'warn', { event: 'xtream_request_failed', sourceId: source.id, action, code, httpStatus: error?.httpStatus || httpStatus, durationMs: Date.now() - startedAt });
+      logXtream(logger, 'warn', { event: 'xtream_request_failed', sourceId: source.id, action, code, httpStatus: error?.httpStatus || httpStatus, durationMs: Date.now() - startedAt, responseMime, responseBytes, responseKind, redirected });
       throw createXtreamError(code, error?.httpStatus || httpStatus);
     } finally { clearTimeout(timer); }
   }
