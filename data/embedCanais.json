@@ -1,0 +1,1242 @@
+[
+  {
+    "id": "1",
+    "slug": "amazonprimevideo",
+    "name": "Amazon Prime",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/amazonprimevideo.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=amazonprimevideo/"
+  },
+  {
+    "id": "2",
+    "slug": "amazonprimevideo02",
+    "name": "Amazon Prime 02",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/amazonprimevideo.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=amazonprimevideo02/"
+  },
+  {
+    "id": "3",
+    "slug": "amazonprimevideo03",
+    "name": "Amazon Prime 03",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/amazonprimevideo.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=amazonprimevideo03/"
+  },
+  {
+    "id": "4",
+    "slug": "amazonprimevideo04",
+    "name": "Amazon Prime 04",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/amazonprimevideo.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=amazonprimevideo04/"
+  },
+  {
+    "id": "5",
+    "slug": "amazonprimevideo05",
+    "name": "Amazon Prime 05",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/amazonprimevideo.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=amazonprimevideo05/"
+  },
+  {
+    "id": "6",
+    "slug": "appletv01",
+    "name": "Apple TV 01",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/appletv1.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=appletv01/"
+  },
+  {
+    "id": "7",
+    "slug": "appletv02",
+    "name": "Apple TV 02",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/appletv1.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=appletv02/"
+  },
+  {
+    "id": "8",
+    "slug": "appletv03",
+    "name": "Apple TV 03",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/appletv1.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=appletv03/"
+  },
+  {
+    "id": "9",
+    "slug": "appletv04",
+    "name": "Apple TV 04",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/appletv1.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=appletv04/"
+  },
+  {
+    "id": "10",
+    "slug": "appletv05",
+    "name": "Apple TV 05",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/appletv1.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=appletv05/"
+  },
+  {
+    "id": "11",
+    "slug": "appletv06",
+    "name": "Apple TV 06",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/appletv1.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=appletv06/"
+  },
+  {
+    "id": "12",
+    "slug": "bandsports",
+    "name": "Band Sports",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/bandsports.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=bandsports/"
+  },
+  {
+    "id": "13",
+    "slug": "canalgoat",
+    "name": "Canal GOAT",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/canalgoat.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=canalgoat/"
+  },
+  {
+    "id": "14",
+    "slug": "canaloff",
+    "name": "Canal Off",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/canaloff.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=canaloff/"
+  },
+  {
+    "id": "15",
+    "slug": "cazetv",
+    "name": "CazéTV",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/cazetv.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=cazetv/"
+  },
+  {
+    "id": "16",
+    "slug": "cazetv2",
+    "name": "CazéTV 2",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/cazetv.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=cazetv2/"
+  },
+  {
+    "id": "17",
+    "slug": "cazetv3",
+    "name": "CazéTV 3",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/cazetv.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=cazetv3/"
+  },
+  {
+    "id": "18",
+    "slug": "cazetv4",
+    "name": "CazéTV 4",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/cazetv.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=cazetv4/"
+  },
+  {
+    "id": "19",
+    "slug": "cazetv5",
+    "name": "CazéTV 5",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/cazetv.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=cazetv5/"
+  },
+  {
+    "id": "20",
+    "slug": "cazetv6",
+    "name": "CazéTV 6",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/cazetv.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=cazetv6/"
+  },
+  {
+    "id": "21",
+    "slug": "combate",
+    "name": "Combate",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/combate.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=combate/"
+  },
+  {
+    "id": "22",
+    "slug": "dazn",
+    "name": "DAZN",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/dazn.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=dazn/"
+  },
+  {
+    "id": "23",
+    "slug": "disneyplus07",
+    "name": "Disney + 07",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/disneyplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=disneyplus07/"
+  },
+  {
+    "id": "24",
+    "slug": "disneyplus08",
+    "name": "Disney + 08",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/disneyplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=disneyplus08/"
+  },
+  {
+    "id": "25",
+    "slug": "disneyplus09",
+    "name": "Disney + 09",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/disneyplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=disneyplus09/"
+  },
+  {
+    "id": "26",
+    "slug": "disneyplus",
+    "name": "Disney+",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/disneyplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=disneyplus/"
+  },
+  {
+    "id": "27",
+    "slug": "disneyplus02",
+    "name": "Disney+ 02",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/disneyplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=disneyplus02/"
+  },
+  {
+    "id": "28",
+    "slug": "disneyplus03",
+    "name": "Disney+ 03",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/disneyplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=disneyplus03/"
+  },
+  {
+    "id": "29",
+    "slug": "disneyplus04",
+    "name": "Disney+ 04",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/disneyplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=disneyplus04/"
+  },
+  {
+    "id": "30",
+    "slug": "disneyplus05",
+    "name": "Disney+ 05",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/disneyplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=disneyplus05/"
+  },
+  {
+    "id": "31",
+    "slug": "disneyplus06",
+    "name": "Disney+ 06",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/disneyplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=disneyplus06"
+  },
+  {
+    "id": "32",
+    "slug": "espn",
+    "name": "ESPN",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/espn.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=espn/"
+  },
+  {
+    "id": "33",
+    "slug": "espn2",
+    "name": "ESPN 2",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/espn.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=espn2/"
+  },
+  {
+    "id": "34",
+    "slug": "espn3",
+    "name": "ESPN 3",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/espn.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=espn3/"
+  },
+  {
+    "id": "35",
+    "slug": "espn4",
+    "name": "ESPN 4",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/espn.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=espn4/"
+  },
+  {
+    "id": "36",
+    "slug": "espn5",
+    "name": "ESPN 5",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/espn.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=espn5/"
+  },
+  {
+    "id": "37",
+    "slug": "espn6",
+    "name": "ESPN 6",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/espn.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=espn6/"
+  },
+  {
+    "id": "38",
+    "slug": "getv",
+    "name": "GE TV",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/getv.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=getv/"
+  },
+  {
+    "id": "39",
+    "slug": "max",
+    "name": "Max",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/max.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=max/"
+  },
+  {
+    "id": "40",
+    "slug": "max02",
+    "name": "Max 02",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/max.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=max02/"
+  },
+  {
+    "id": "41",
+    "slug": "max03",
+    "name": "Max 03",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/max.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=max03/"
+  },
+  {
+    "id": "42",
+    "slug": "max04",
+    "name": "Max 04",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/max.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=max04/"
+  },
+  {
+    "id": "43",
+    "slug": "max05",
+    "name": "Max 05",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/max.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=max05/"
+  },
+  {
+    "id": "44",
+    "slug": "max06",
+    "name": "Max 06",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/max.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=max06/"
+  },
+  {
+    "id": "45",
+    "slug": "nsports",
+    "name": "N Sports",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/nsports.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=nsports/"
+  },
+  {
+    "id": "46",
+    "slug": "nossofutebol",
+    "name": "Nosso Futebol",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/nossofutebol.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=nossofutebol/"
+  },
+  {
+    "id": "47",
+    "slug": "paramountplus",
+    "name": "Paramount +",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/paramountplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=paramountplus/"
+  },
+  {
+    "id": "48",
+    "slug": "paramountplus02",
+    "name": "Paramount + 02",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/paramountplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=paramountplus02/"
+  },
+  {
+    "id": "49",
+    "slug": "paramountplus03",
+    "name": "Paramount+ 03",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/paramountplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=paramountplus03/"
+  },
+  {
+    "id": "50",
+    "slug": "paramountplus04",
+    "name": "Paramount+ 04",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/paramountplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=paramountplus04/"
+  },
+  {
+    "id": "51",
+    "slug": "paramountplus05",
+    "name": "Paramount+ 05",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/paramountplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=paramountplus05/"
+  },
+  {
+    "id": "52",
+    "slug": "paramountplus06",
+    "name": "Paramount+ 06",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/paramountplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=paramountplus06/"
+  },
+  {
+    "id": "53",
+    "slug": "paramountplus07",
+    "name": "Paramount+ 07",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/paramountplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=paramountplus07/"
+  },
+  {
+    "id": "54",
+    "slug": "premiere2",
+    "name": "Premiere 2",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/premiere.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=premiere2/"
+  },
+  {
+    "id": "55",
+    "slug": "premiere3",
+    "name": "Premiere 3",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/premiere.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=premiere3/"
+  },
+  {
+    "id": "56",
+    "slug": "premiere4",
+    "name": "Premiere 4",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/premiere.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=premiere4/"
+  },
+  {
+    "id": "57",
+    "slug": "premiere5",
+    "name": "Premiere 5",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/premiere.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=premiere5/"
+  },
+  {
+    "id": "58",
+    "slug": "premiere6",
+    "name": "Premiere 6",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/premiere.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=premiere6/"
+  },
+  {
+    "id": "59",
+    "slug": "premiere7",
+    "name": "Premiere 7",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/premiere.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=premiere7/"
+  },
+  {
+    "id": "60",
+    "slug": "premiere8",
+    "name": "Premiere 8",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/premiere.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=premiere8/"
+  },
+  {
+    "id": "61",
+    "slug": "premiereclubes",
+    "name": "Premiere Clubes",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/premiere.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=premiereclubes/"
+  },
+  {
+    "id": "62",
+    "slug": "sportv",
+    "name": "SporTV",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/sportv.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=sportv/"
+  },
+  {
+    "id": "63",
+    "slug": "sportv2",
+    "name": "SporTV 2",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/sportv2.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=sportv2/"
+  },
+  {
+    "id": "64",
+    "slug": "sportv3",
+    "name": "SporTV 3",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/sportv3.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=sportv3/"
+  },
+  {
+    "id": "65",
+    "slug": "sportynet",
+    "name": "SportyNet",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/sportynet.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=sportynet/"
+  },
+  {
+    "id": "66",
+    "slug": "sportynet1",
+    "name": "SportyNet +1",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/sportynet.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=sportynet1/"
+  },
+  {
+    "id": "67",
+    "slug": "sportynet2",
+    "name": "SportyNet +2",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/sportynet.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=sportynet2/"
+  },
+  {
+    "id": "68",
+    "slug": "sportynet3",
+    "name": "SportyNet +3",
+    "category": "Esportes",
+    "image": "https://vipcanais.net/images/sportynet.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=sportynet3/"
+  },
+  {
+    "id": "69",
+    "slug": "tnt",
+    "name": "TNT",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/tnt.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tnt/"
+  },
+  {
+    "id": "71",
+    "slug": "xsports",
+    "name": "Xsports",
+    "category": "Esportes",
+    "image": "https://1.embedcanaisdetv.com/images/xsports.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=xsports/"
+  },
+  {
+    "id": "72",
+    "slug": "aee",
+    "name": "A&E",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/aee.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=aee/"
+  },
+  {
+    "id": "73",
+    "slug": "amc",
+    "name": "AMC",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/amc.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=amc/"
+  },
+  {
+    "id": "74",
+    "slug": "amcseries",
+    "name": "AMC Séries",
+    "category": "Filmes e Séries",
+    "image": "https://vipcanais.net/images/amcseries.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=amcseries/"
+  },
+  {
+    "id": "75",
+    "slug": "axn",
+    "name": "AXN",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/axn.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=axn/"
+  },
+  {
+    "id": "76",
+    "slug": "cinemax",
+    "name": "Cinemax",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/cinemax.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=cinemax/"
+  },
+  {
+    "id": "77",
+    "slug": "globoplaynovelas",
+    "name": "Globoplay Novelas",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/globoplaynovelas.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=globoplaynovelas/"
+  },
+  {
+    "id": "78",
+    "slug": "hbo",
+    "name": "HBO",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/hbo.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=hbo/"
+  },
+  {
+    "id": "79",
+    "slug": "hbo2",
+    "name": "HBO 2",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/hbo2.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=hbo2/"
+  },
+  {
+    "id": "80",
+    "slug": "hbofamily",
+    "name": "HBO Family",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/hbofamily.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=hbofamily/"
+  },
+  {
+    "id": "81",
+    "slug": "hbomundi",
+    "name": "HBO Mundi",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/hbomundi.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=hbomundi/"
+  },
+  {
+    "id": "82",
+    "slug": "hboplus",
+    "name": "HBO Plus",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/hboplus.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=hboplus/"
+  },
+  {
+    "id": "83",
+    "slug": "hbopop",
+    "name": "HBO Pop",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/hbopop.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=hbopop/"
+  },
+  {
+    "id": "84",
+    "slug": "hbosignature",
+    "name": "HBO Signature",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/hbosignature.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=hbosignature/"
+  },
+  {
+    "id": "85",
+    "slug": "hboxtreme",
+    "name": "HBO Xtreme",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/hboxtreme.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=hboxtreme/"
+  },
+  {
+    "id": "86",
+    "slug": "megapix",
+    "name": "Megapix",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/megapix.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=megapix/"
+  },
+  {
+    "id": "87",
+    "slug": "paramountnetwork",
+    "name": "Paramount Network",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/paramountnetwork.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=paramountnetwork/"
+  },
+  {
+    "id": "88",
+    "slug": "sonychannel",
+    "name": "Sony Channel",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/sonychannel.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=sonychannel/"
+  },
+  {
+    "id": "89",
+    "slug": "space",
+    "name": "Space",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/space.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=space/"
+  },
+  {
+    "id": "90",
+    "slug": "studiouniversal",
+    "name": "Studio Universal",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/studiouniversal.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=studiouniversal/"
+  },
+  {
+    "id": "91",
+    "slug": "tcaction",
+    "name": "Telecine Action",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/tcaction.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tcaction/"
+  },
+  {
+    "id": "92",
+    "slug": "tccult",
+    "name": "Telecine Cult",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/tccult.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tccult/"
+  },
+  {
+    "id": "93",
+    "slug": "tcfun",
+    "name": "Telecine Fun",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/tcfun.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tcfun/"
+  },
+  {
+    "id": "94",
+    "slug": "tcpipoca",
+    "name": "Telecine Pipoca",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/tcpipoca.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tcpipoca/"
+  },
+  {
+    "id": "95",
+    "slug": "tcpremium",
+    "name": "Telecine Premium",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/tcpremium.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tcpremium/"
+  },
+  {
+    "id": "96",
+    "slug": "tctouch",
+    "name": "Telecine Touch",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/tctouch.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tctouch/"
+  },
+  {
+    "id": "98",
+    "slug": "tntnovelas",
+    "name": "TNT Novelas",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/tntnovelas.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tntnovelas/"
+  },
+  {
+    "id": "99",
+    "slug": "tntseries",
+    "name": "TNT Series",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/tntseries.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tntseries/"
+  },
+  {
+    "id": "100",
+    "slug": "universaltv",
+    "name": "Universal TV",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/universaltv.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=universaltv/"
+  },
+  {
+    "id": "101",
+    "slug": "usa",
+    "name": "USA",
+    "category": "Filmes e Séries",
+    "image": "https://vipcanais.net/images/usa.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=usa/"
+  },
+  {
+    "id": "102",
+    "slug": "warner",
+    "name": "Warner Channel",
+    "category": "Filmes e Séries",
+    "image": "https://1.embedcanaisdetv.com/images/warnertv.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=warner/"
+  },
+  {
+    "id": "103",
+    "slug": "bandsp",
+    "name": "Band SP",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/bandsp.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=bandsp/"
+  },
+  {
+    "id": "104",
+    "slug": "globodf",
+    "name": "Globo DF",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/globo.webp",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=globodf/"
+  },
+  {
+    "id": "105",
+    "slug": "globoes",
+    "name": "Globo Espírito Santo",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/globo.webp",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=globoes/"
+  },
+  {
+    "id": "106",
+    "slug": "globomg",
+    "name": "Globo Minas",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/globo.webp",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=globomg/"
+  },
+  {
+    "id": "107",
+    "slug": "globors",
+    "name": "Globo Porto Alegre",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/globo.webp",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=globors/"
+  },
+  {
+    "id": "108",
+    "slug": "globorj",
+    "name": "Globo Rio",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/globo.webp",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=globorj/"
+  },
+  {
+    "id": "109",
+    "slug": "globosp",
+    "name": "Globo São Paulo",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/globo.webp",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=globosp/"
+  },
+  {
+    "id": "110",
+    "slug": "recorddf",
+    "name": "Record DF",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/record.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=recorddf/"
+  },
+  {
+    "id": "111",
+    "slug": "recordes",
+    "name": "Record Espírito Santo",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/record.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=recordes/"
+  },
+  {
+    "id": "112",
+    "slug": "recordmg",
+    "name": "Record Minas",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/record.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=recordmg/"
+  },
+  {
+    "id": "113",
+    "slug": "recordrj",
+    "name": "Record Rio",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/record.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=recordrj/"
+  },
+  {
+    "id": "114",
+    "slug": "recordsp",
+    "name": "Record São Paulo",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/record.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=recordsp/"
+  },
+  {
+    "id": "115",
+    "slug": "redetv",
+    "name": "RedeTV!",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/redetv.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=redetv/"
+  },
+  {
+    "id": "116",
+    "slug": "sbtrj",
+    "name": "SBT Rio",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/sbtsp.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=sbtrj/"
+  },
+  {
+    "id": "117",
+    "slug": "sbtsp",
+    "name": "SBT São Paulo",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/sbtsp.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=sbtsp/"
+  },
+  {
+    "id": "118",
+    "slug": "tvcultura",
+    "name": "TV Cultura",
+    "category": "Canais Abertos",
+    "image": "https://1.embedcanaisdetv.com/images/tvcultura.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tvcultura/"
+  },
+  {
+    "id": "119",
+    "slug": "adultswim",
+    "name": "Adult Swim",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/adultswim.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=adultswim/"
+  },
+  {
+    "id": "120",
+    "slug": "animalplanet",
+    "name": "Animal Planet",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/animalplanet.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=animalplanet/"
+  },
+  {
+    "id": "121",
+    "slug": "comedycentral",
+    "name": "Comedy Central",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/comedycentral.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=comedycentral/"
+  },
+  {
+    "id": "122",
+    "slug": "discoverychannel",
+    "name": "Discovery Channel",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/discoverychannel.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=discoverychannel/"
+  },
+  {
+    "id": "123",
+    "slug": "discoveryhh",
+    "name": "Discovery Home & Health",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/discoveryhh.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=discoveryhh/"
+  },
+  {
+    "id": "124",
+    "slug": "discoveryscience",
+    "name": "Discovery Science",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/discoveryscience.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=discoveryscience/"
+  },
+  {
+    "id": "125",
+    "slug": "discoverytheater",
+    "name": "Discovery Theater",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/discoverytheater.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=discoverytheater/"
+  },
+  {
+    "id": "126",
+    "slug": "discoveryturbo",
+    "name": "Discovery Turbo",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/discoveryturbo.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=discoveryturbo/"
+  },
+  {
+    "id": "127",
+    "slug": "discoveryworld",
+    "name": "Discovery World",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/discoveryworld.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=discoveryworld/"
+  },
+  {
+    "id": "128",
+    "slug": "foodnetwork",
+    "name": "Food Network",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/foodnetwork.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=foodnetwork/"
+  },
+  {
+    "id": "129",
+    "slug": "gnt",
+    "name": "GNT",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/gnt.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=gnt/"
+  },
+  {
+    "id": "130",
+    "slug": "hgtv",
+    "name": "HGTV",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/hgtv.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=hgtv/"
+  },
+  {
+    "id": "131",
+    "slug": "history",
+    "name": "History",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/history.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=history/"
+  },
+  {
+    "id": "132",
+    "slug": "history2",
+    "name": "History 2",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/history2.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=history2/"
+  },
+  {
+    "id": "133",
+    "slug": "discoveryid",
+    "name": "Investigation Discovery",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/discoveryid.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=discoveryid/"
+  },
+  {
+    "id": "134",
+    "slug": "mtv",
+    "name": "MTV",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/mtv.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=mtv/"
+  },
+  {
+    "id": "135",
+    "slug": "multishow",
+    "name": "Multishow",
+    "category": "Variedades",
+    "image": "https://1.embedcanaisdetv.com/images/multishow.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=multishow/"
+  },
+  {
+    "id": "136",
+    "slug": "bandnews",
+    "name": "BandNews",
+    "category": "Notícias",
+    "image": "https://1.embedcanaisdetv.com/images/bandnews.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=bandnews/"
+  },
+  {
+    "id": "137",
+    "slug": "cnnbrasil",
+    "name": "CNN Brasil",
+    "category": "Notícias",
+    "image": "https://1.embedcanaisdetv.com/images/cnnbrasil.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=cnnbrasil/"
+  },
+  {
+    "id": "138",
+    "slug": "globonews",
+    "name": "GloboNews",
+    "category": "Notícias",
+    "image": "https://1.embedcanaisdetv.com/images/globonews.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=globonews/"
+  },
+  {
+    "id": "139",
+    "slug": "jovempannews",
+    "name": "Jovem Pan News",
+    "category": "Notícias",
+    "image": "https://1.embedcanaisdetv.com/images/jovempannews.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=jovempannews/"
+  },
+  {
+    "id": "140",
+    "slug": "recordnews",
+    "name": "Record News",
+    "category": "Notícias",
+    "image": "https://1.embedcanaisdetv.com/images/recordnews.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=recordnews/"
+  },
+  {
+    "id": "141",
+    "slug": "cartoonnetwork",
+    "name": "Cartoon Network",
+    "category": "Infantil",
+    "image": "https://1.embedcanaisdetv.com/images/cartoonnetwork.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=cartoonnetwork/"
+  },
+  {
+    "id": "142",
+    "slug": "cartoonito",
+    "name": "Cartoonito",
+    "category": "Infantil",
+    "image": "https://1.embedcanaisdetv.com/images/cartoonito.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=cartoonito/"
+  },
+  {
+    "id": "143",
+    "slug": "discoverykids",
+    "name": "Discovery Kids",
+    "category": "Infantil",
+    "image": "https://1.embedcanaisdetv.com/images/discoverykids.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=discoverykids/"
+  },
+  {
+    "id": "144",
+    "slug": "dreamworks",
+    "name": "DreamWorks",
+    "category": "Infantil",
+    "image": "https://1.embedcanaisdetv.com/images/dreamworks.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=dreamworks/"
+  },
+  {
+    "id": "145",
+    "slug": "gloob",
+    "name": "Gloob",
+    "category": "Infantil",
+    "image": "https://1.embedcanaisdetv.com/images/gloob.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=gloob/"
+  },
+  {
+    "id": "146",
+    "slug": "gloobinho",
+    "name": "Gloobinho",
+    "category": "Infantil",
+    "image": "https://1.embedcanaisdetv.com/images/gloobinho.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=gloobinho/"
+  },
+  {
+    "id": "147",
+    "slug": "nickjr",
+    "name": "Nick Jr.",
+    "category": "Infantil",
+    "image": "https://1.embedcanaisdetv.com/images/nickjr.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=nickjr/"
+  },
+  {
+    "id": "148",
+    "slug": "nickelodeon",
+    "name": "Nickelodeon",
+    "category": "Infantil",
+    "image": "https://1.embedcanaisdetv.com/images/nickelodeon.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=nickelodeon/"
+  },
+  {
+    "id": "149",
+    "slug": "tooncast",
+    "name": "Tooncast",
+    "category": "Infantil",
+    "image": "https://1.embedcanaisdetv.com/images/tooncast.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tooncast/"
+  },
+  {
+    "id": "150",
+    "slug": "tvratimbum",
+    "name": "TV Ra Tim Bum",
+    "category": "Infantil",
+    "image": "https://vipcanais.net/images/tvratimbum.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tvratimbum/"
+  },
+  {
+    "id": "151",
+    "slug": "cancaonova",
+    "name": "Canção Nova",
+    "category": "Religiosos",
+    "image": "https://vipcanais.net/images/cancaonova.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=cancaonova/"
+  },
+  {
+    "id": "152",
+    "slug": "novotempo",
+    "name": "Novo Tempo",
+    "category": "Religiosos",
+    "image": "https://vipcanais.net/images/novotempo.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=novotempo/"
+  },
+  {
+    "id": "153",
+    "slug": "paieterno",
+    "name": "Pai Eterno",
+    "category": "Religiosos",
+    "image": "https://vipcanais.net/images/paieterno.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=paieterno/"
+  },
+  {
+    "id": "154",
+    "slug": "redegospel",
+    "name": "Rede Gospel",
+    "category": "Religiosos",
+    "image": "https://vipcanais.net/images/redegospel.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=redegospel/"
+  },
+  {
+    "id": "155",
+    "slug": "redevida",
+    "name": "Rede Vida",
+    "category": "Religiosos",
+    "image": "https://vipcanais.net/images/redevida.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=redevida/"
+  },
+  {
+    "id": "156",
+    "slug": "tvaparecida",
+    "name": "TV Aparecida",
+    "category": "Religiosos",
+    "image": "https://vipcanais.net/images/tvaparecida.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tvaparecida/"
+  },
+  {
+    "id": "157",
+    "slug": "tvevangelizar",
+    "name": "TV Evangelizar",
+    "category": "Religiosos",
+    "image": "https://vipcanais.net/images/tvevangelizar.png",
+    "href": "https://embedcanaisdetv.xyz/e/index.php?canal=tvevangelizar/"
+  }
+]
