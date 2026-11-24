@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "IracemaFlix TV API",
-    "version": "1.1.0",
-    "description": "Catálogo EmbedTV, TV ao vivo, fontes Xtream configuráveis e EPG XMLTV. Credenciais Xtream são carregadas no servidor e nunca retornadas nas respostas."
+    "version": "1.1.1",
+    "description": "Catálogos EmbedTV e Embed Canais, TV ao vivo, fontes Xtream configuráveis e EPG XMLTV. Credenciais Xtream são carregadas no servidor e nunca retornadas nas respostas."
   },
   "servers": [{ "url": "https://SEU-HOST-TV" }],
   "paths": {
@@ -20,7 +20,7 @@
       "get": {
         "summary": "Categorias locais e Xtream",
         "parameters": [
-          { "name": "source", "in": "query", "schema": { "type": "string", "enum": ["all", "embedtv", "xtream"] } },
+          { "name": "source", "in": "query", "schema": { "type": "string", "enum": ["all", "embedtv", "embedcanais", "xtream"] } },
           { "name": "sourceId", "in": "query", "schema": { "type": "string" } }
         ],
         "responses": { "200": { "description": "Categorias com contagem por fonte" }, "400": { "description": "Fonte inválida" } }
@@ -28,9 +28,9 @@
     },
     "/api/v1/channels": {
       "get": {
-        "summary": "Listar canais EmbedTV, ao vivo e Xtream",
+        "summary": "Listar canais EmbedTV, Embed Canais, ao vivo e Xtream",
         "parameters": [
-          { "name": "source", "in": "query", "schema": { "type": "string", "enum": ["all", "embedtv", "live", "xtream"] } },
+          { "name": "source", "in": "query", "schema": { "type": "string", "enum": ["all", "embedtv", "embedcanais", "live", "xtream"] } },
           { "name": "sourceId", "in": "query", "schema": { "type": "string" } },
           { "name": "search", "in": "query", "schema": { "type": "string" } },
           { "name": "category", "in": "query", "schema": { "type": "string" } },
@@ -41,7 +41,7 @@
       }
     },
     "/api/v1/channels/{id}": {
-      "get": { "summary": "Consultar canal local por ID", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "Dados do canal" }, "404": { "description": "Canal inexistente" } } }
+      "get": { "summary": "Consultar canal EmbedTV ou Embed Canais por ID", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "Dados do canal" }, "404": { "description": "Canal inexistente" } } }
     },
     "/api/v1/sports": {
       "get": { "summary": "Eventos esportivos públicos", "responses": { "200": { "description": "Eventos" }, "502": { "description": "Fonte upstream indisponível" } } }
