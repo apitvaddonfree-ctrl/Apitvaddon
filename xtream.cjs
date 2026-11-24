@@ -2,10 +2,12 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const crypto = require('node:crypto');
 const { safeHttpUrl, clampInt } = require('./http.cjs');
 
 const MAX_SOURCES = 50;
 const DEFAULT_SOURCE_TIMEOUT_MS = 8000;
+const MAX_ERROR_BODY_BYTES = 16384;
 
 function normalizeXtreamSource(raw, index) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error(`Fonte Xtream ${index + 1} inválida.`);
@@ -128,6 +130,83 @@ function classifyResponseBody(text, mime) {
   return 'text';
 }
 
+function safeHost(value) {
+  try { return new URL(String(value)).hostname.toLowerCase().slice(0, 253); }
+  catch { return null; }
+}
+
+function safeResponseHeaders(response) {
+  const result = {};
+  for (const name of ['server', 'via', 'cf-ray', 'cf-cache-status', 'x-cache', 'x-served-by']) {
+    const raw = String(response.headers?.get?.(name) || '').trim();
+    if (!raw) continue;
+    result[name] = raw.replace(/[^A-Za-z0-9 .,:/+()_-]/g, '').slice(0, 120);
+  }
+  return result;
+}
+
+function responseMarkers(text) {
+  const value = String(text || '').toLowerCase();
+  const tests = [
+    ['cloudflare', /cloudflare/],
+    ['cloudfront', /cloudfront/],
+    ['access_denied', /access[\s_-]*denied|\bforbidden\b/],
+    ['blocked', /\bblocked\b|\bblacklisted\b/],
+    ['challenge', /\bchallenge\b|\bcaptcha\b|verify you are human/],
+    ['rate_limited', /rate[\s_-]*limit|too many requests/],
+    ['upstream_error', /bad gateway|upstream error|service unavailable/],
+    ['not_found', /\bnot found\b|\b404\b/]
+  ];
+  return tests.filter(([, pattern]) => pattern.test(value)).map(([name]) => name);
+}
+
+function responseTemplateFingerprint(text, mime) {
+  let template = String(text || '').slice(0, MAX_ERROR_BODY_BYTES);
+  if (mime === 'text/html' || /<[^>]+>/.test(template)) {
+    template = template
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/\s+[a-z_:][-a-z0-9_:.]*\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, ' attr=""')
+      .replace(/>[^<]*</g, '><')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  } else {
+    template = `${mime}|${classifyResponseBody(template, mime)}|${template.length}|${responseMarkers(template).join(',')}`;
+  }
+  return crypto.createHash('sha256').update(template, 'utf8').digest('hex').slice(0, 16);
+}
+
+async function readBoundedErrorBody(response) {
+  const reader = response.body?.getReader?.();
+  if (!reader) return { text: '', bytes: 0, truncated: false };
+  const chunks = [];
+  let bytes = 0;
+  let truncated = false;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = Buffer.from(value);
+      const remaining = MAX_ERROR_BODY_BYTES - bytes;
+      if (chunk.length > remaining) {
+        if (remaining > 0) chunks.push(chunk.subarray(0, remaining));
+        bytes += Math.max(0, remaining);
+        truncated = true;
+        await reader.cancel().catch(() => {});
+        break;
+      }
+      chunks.push(chunk);
+      bytes += chunk.length;
+      if (bytes >= MAX_ERROR_BODY_BYTES) {
+        truncated = true;
+        await reader.cancel().catch(() => {});
+        break;
+      }
+    }
+  } catch { /* Keep the safe partial diagnostics collected so far. */ }
+  return { text: Buffer.concat(chunks).toString('utf8'), bytes, truncated };
+}
+
 function logXtream(logger, level, fields) {
   try {
     const method = logger?.[level];
@@ -201,6 +280,12 @@ function createXtreamClient({ fetchImpl = globalThis.fetch, sources = [], cacheM
     let responseBytes = null;
     let responseKind = 'not_received';
     let redirected = false;
+    const upstreamHost = safeHost(source.base);
+    let responseHost = null;
+    let responseHeaders = {};
+    let responseTemplate = null;
+    let markers = [];
+    let responseTruncated = false;
     timer.unref?.();
     try {
       const response = await fetchImpl(url, {
@@ -210,23 +295,45 @@ function createXtreamClient({ fetchImpl = globalThis.fetch, sources = [], cacheM
       httpStatus = response.status;
       responseMime = safeResponseMimeType(response.headers?.get?.('content-type'));
       redirected = Boolean(response.redirected);
-      if (!response.ok) throw createXtreamError(`HTTP_${response.status}`, response.status);
+      responseHost = safeHost(response.url);
+      responseHeaders = safeResponseHeaders(response);
+      if (!response.ok) {
+        const body = await readBoundedErrorBody(response);
+        responseBytes = body.bytes;
+        responseKind = classifyResponseBody(body.text, responseMime);
+        responseTemplate = responseTemplateFingerprint(body.text, responseMime);
+        markers = responseMarkers(body.text);
+        responseTruncated = body.truncated;
+        throw createXtreamError(`HTTP_${response.status}`, response.status);
+      }
       const text = await response.text();
       responseBytes = Buffer.byteLength(text, 'utf8');
-      responseKind = classifyResponseBody(text, responseMime);
       let payload;
-      try { payload = JSON.parse(text); }
-      catch { throw createXtreamError('INVALID_JSON', httpStatus); }
-      if (action === 'get_live_streams' && !Array.isArray(payload)) throw createXtreamError('INVALID_STREAMS_SHAPE', httpStatus);
+      try {
+        payload = JSON.parse(text);
+        responseKind = 'json';
+      } catch {
+        responseKind = classifyResponseBody(text, responseMime);
+        responseTemplate = responseTemplateFingerprint(text, responseMime);
+        markers = responseMarkers(text);
+        throw createXtreamError('INVALID_JSON', httpStatus);
+      }
+      if (action === 'get_live_streams' && !Array.isArray(payload)) {
+        responseTemplate = responseTemplateFingerprint(text, responseMime);
+        markers = responseMarkers(text);
+        throw createXtreamError('INVALID_STREAMS_SHAPE', httpStatus);
+      }
       if (action === 'get_live_categories' && !Array.isArray(payload)) {
-        logXtream(logger, 'warn', { event: 'xtream_request_failed', sourceId: source.id, action, code: 'INVALID_CATEGORIES_SHAPE', httpStatus, durationMs: Date.now() - startedAt, responseMime, responseBytes, responseKind, redirected });
+        responseTemplate = responseTemplateFingerprint(text, responseMime);
+        markers = responseMarkers(text);
+        logXtream(logger, 'warn', { event: 'xtream_request_failed', sourceId: source.id, action, code: 'INVALID_CATEGORIES_SHAPE', httpStatus, durationMs: Date.now() - startedAt, upstreamHost, responseHost, responseHeaders, responseMime, responseBytes, responseKind, responseTemplateFingerprint: responseTemplate, responseMarkers: markers, responseTruncated, redirected });
       } else {
-        logXtream(logger, 'info', { event: 'xtream_request_ok', sourceId: source.id, action, httpStatus, durationMs: Date.now() - startedAt, count: Array.isArray(payload) ? payload.length : null, responseMime, responseBytes, responseKind, redirected });
+        logXtream(logger, 'info', { event: 'xtream_request_ok', sourceId: source.id, action, httpStatus, durationMs: Date.now() - startedAt, upstreamHost, responseHost, responseHeaders, count: Array.isArray(payload) ? payload.length : null, responseMime, responseBytes, responseKind, redirected });
       }
       return payload;
     } catch (error) {
       const code = safeXtreamErrorCode(error);
-      logXtream(logger, 'warn', { event: 'xtream_request_failed', sourceId: source.id, action, code, httpStatus: error?.httpStatus || httpStatus, durationMs: Date.now() - startedAt, responseMime, responseBytes, responseKind, redirected });
+      logXtream(logger, 'warn', { event: 'xtream_request_failed', sourceId: source.id, action, code, httpStatus: error?.httpStatus || httpStatus, durationMs: Date.now() - startedAt, upstreamHost, responseHost, responseHeaders, responseMime, responseBytes, responseKind, ...(responseTemplate ? { responseTemplateFingerprint: responseTemplate } : {}), responseMarkers: markers, responseTruncated, redirected });
       throw createXtreamError(code, error?.httpStatus || httpStatus);
     } finally { clearTimeout(timer); }
   }
