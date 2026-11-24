@@ -12,6 +12,7 @@ const APP_CONFIG_FILE = path.join(CONFIG_DIR, 'app-config.json');
 const EPG_CONFIG_FILE = path.join(CONFIG_DIR, 'epg.json');
 const CHANNELS_DEFAULT = path.join(__dirname, 'data', 'embedTV.json');
 const EMBED_CANAIS_HOME_DEFAULT = 'https://embedcanais.online/';
+const EMBED_CANAIS_FALLBACK_FILE = path.join(__dirname, 'data', 'embedCanais.json');
 const XML_PARSER = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '@_', textNodeName: '#text', parseTagValue: false, trimValues: true });
 
 function readJson(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
@@ -123,7 +124,7 @@ function extractEmbedCanaisArray(html) {
 
 function mapEmbedCanaisChannels(payload) {
   const raw = Array.isArray(payload) ? payload : arrayPayload(payload);
-  return raw.map((channel) => {
+  const mapped = raw.map((channel) => {
     const name = String(channel?.name || channel?.title || channel?.slug || '').trim().slice(0, 200);
     const slug = String(channel?.slug || channel?.id || name).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 120);
     let sourceUrl = '';
@@ -139,9 +140,12 @@ function mapEmbedCanaisChannels(payload) {
       playbackMode: /\.m3u8(?:$|[?#])/i.test(sourceUrl) ? 'hls' : 'external-page'
     };
   }).filter(Boolean);
+  const unique = new Map();
+  for (const channel of mapped) if (!unique.has(channel.id)) unique.set(channel.id, channel);
+  return [...unique.values()];
 }
 
-function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FILE, epgConfigFile = EPG_CONFIG_FILE, channelsFile = null, xtreamSources = null, logger = console } = {}) {
+function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FILE, epgConfigFile = EPG_CONFIG_FILE, channelsFile = null, embedCanaisFallbackFile = EMBED_CANAIS_FALLBACK_FILE, xtreamSources = null, logger = console } = {}) {
   const config = readAppConfig(appConfigFile);
   const localChannelsFile = resolveChannelsFile(config, channelsFile);
   const channelData = readChannelData(localChannelsFile);
@@ -229,6 +233,11 @@ function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FI
         const items = mapEmbedCanaisChannels(extractEmbedCanaisArray(html));
         if (!items.length) throw new Error('Catálogo Embed Canais vazio');
         return items;
+      } catch (error) {
+        let fallback = [];
+        try { fallback = mapEmbedCanaisChannels(readJson(embedCanaisFallbackFile)); } catch { /* O snapshot é opcional; propaga a falha original se ausente. */ }
+        if (fallback.length) return fallback;
+        throw error;
       } finally { clearTimeout(timer); }
     });
   }
@@ -261,6 +270,38 @@ function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FI
   async function getLiveChannels() {
     return arrayPayload(await cached('channels', () => upstream(liveBase, '/channels')))
       .map((x) => ({ ...x, source: 'live-tv', playbackMode: x.playbackMode || 'external-page' }));
+  }
+  function channelMatchKey(value) {
+    return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+  }
+  function embedCanaisPlayerUrl(value) {
+    const playerUrl = safeHttpUrl(value, 'URL de player Embed Canais');
+    if (/^(?:www\.)?embedcanaisdetv\.xyz$/i.test(playerUrl.hostname) && /\/e\/index\.php$/i.test(playerUrl.pathname)) {
+      const channel = String(playerUrl.searchParams.get('canal') || '').replace(/[^a-z0-9_-]/gi, '');
+      if (channel) return `https://2910.playerembcanais.com/${channel}/`;
+    }
+    return playerUrl.toString();
+  }
+  function addEmbedCanaisPlayers(channels, embedChannels) {
+    const byName = new Map();
+    for (const channel of embedChannels) {
+      for (const value of [channel.slug, channel.name, channel.title]) {
+        const key = channelMatchKey(value);
+        if (key && !byName.has(key)) byName.set(key, channel);
+      }
+    }
+    return channels.map((channel) => {
+      const matchKey = channelMatchKey(channel.name || channel.title || channel.id);
+      const match = byName.get(matchKey);
+      if (!match) return channel;
+      let playerUrl = '';
+      try { playerUrl = embedCanaisPlayerUrl(match.sourceUrl || match.href || match.url || match.source_url); }
+      catch { return channel; }
+      const embed = { name: 'Embed Canais', provider: 'Embed Canais', source_name: 'Embed Canais', quality: 'FULL HD', embed_url: playerUrl };
+      const embeds = Array.isArray(channel.embeds) ? channel.embeds : [];
+      const existing = embeds.some((item) => String(typeof item === 'string' ? item : item?.embed_url || item?.url || '') === playerUrl);
+      return existing ? channel : { ...channel, embeds: [...embeds, embed] };
+    });
   }
   function categoriesFromXtream(catalog) {
     if (Array.isArray(catalog.categories) && catalog.categories.length) return catalog.categories;
@@ -328,7 +369,13 @@ function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FI
       let xtreamConfigured = configuredXtreamSources.length > 0;
       if (source === 'embedtv') items = await getEmbedChannels();
       if (source === 'embedcanais') items = await getEmbedCanaisChannels();
-      if (source === 'live') items = await getLiveChannels();
+      if (source === 'live') {
+        const [liveResult, embedCanaisResult] = await Promise.allSettled([getLiveChannels(), getEmbedCanaisChannels()]);
+        if (liveResult.status === 'rejected') throw liveResult.reason;
+        items = liveResult.value;
+        if (embedCanaisResult.status === 'fulfilled') items = addEmbedCanaisPlayers(items, embedCanaisResult.value);
+        else failedSources.push('embedcanais');
+      }
       if (source === 'xtream') {
         const catalog = await xtream.getCatalog({ sourceId: String(req.query.sourceId || '') });
         if (catalog.unknownSource) return res.status(404).json({ error: 'Fonte Xtream não configurada', requestId: req.requestId, items: [], total: 0, failedSources: catalog.failedSources, failedSourceDetails: catalog.failedSourceDetails || [] });
@@ -346,7 +393,12 @@ function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FI
         else failedSources.push('embedtv');
         if (embedCanaisResult.status === 'fulfilled') items.push(...embedCanaisResult.value);
         else failedSources.push('embedcanais');
-        if (liveResult.status === 'fulfilled') items.push(...liveResult.value);
+        if (liveResult.status === 'fulfilled') {
+          const liveItems = embedCanaisResult.status === 'fulfilled'
+            ? addEmbedCanaisPlayers(liveResult.value, embedCanaisResult.value)
+            : liveResult.value;
+          items.push(...liveItems);
+        }
         else failedSources.push('live-tv');
         if (xtreamResult.status === 'fulfilled') {
           items.push(...xtreamResult.value.items);
@@ -367,7 +419,24 @@ function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FI
       res.json({ items: items.slice(offset, offset + limit), total: items.length, offset, limit, xtreamConfigured, sources: sourceStatus, failedSources: [...new Set(failedSources)], failedSourceDetails, partial: failedSources.length > 0 });
     } catch { res.status(502).json({ error: 'API de TV ao vivo indisponível', requestId: req.requestId }); }
   });
-  app.get('/api/v1/channels/:id', async (req, res) => { try { const loader = String(req.params.id).startsWith('embedcanais-') ? getEmbedCanaisChannels : getEmbedChannels; const item = (await loader()).find((x) => x.id === req.params.id); return item ? res.json(item) : res.status(404).json({ error: 'Canal não encontrado', requestId: req.requestId }); } catch { return res.status(502).json({ error: 'Catálogo de canais indisponível', requestId: req.requestId }); } });
+  app.get('/api/v1/channels/:id', async (req, res) => {
+    try {
+      const id = String(req.params.id);
+      if (id.startsWith('embedcanais-')) {
+        const item = (await getEmbedCanaisChannels()).find((channel) => channel.id === id);
+        return item ? res.json(item) : res.status(404).json({ error: 'Canal não encontrado', requestId: req.requestId });
+      }
+      const liveChannels = await getLiveChannels().catch(() => []);
+      const liveItem = liveChannels.find((channel) => channel.id === id);
+      if (liveItem) {
+        const embedCanais = await getEmbedCanaisChannels().catch(() => []);
+        return res.json(addEmbedCanaisPlayers([liveItem], embedCanais)[0]);
+      }
+      const [embedChannels, embedCanais] = await Promise.all([getEmbedChannels(), getEmbedCanaisChannels().catch(() => [])]);
+      const embedItem = embedChannels.find((channel) => channel.id === id);
+      return embedItem ? res.json(addEmbedCanaisPlayers([embedItem], embedCanais)[0]) : res.status(404).json({ error: 'Canal não encontrado', requestId: req.requestId });
+    } catch { return res.status(502).json({ error: 'Catálogo de canais indisponível', requestId: req.requestId }); }
+  });
   app.get('/api/v1/sports', async (_req, res) => { try { res.json({ items: arrayPayload(await cached('sports', () => upstream(liveBase, '/sports')), ['sports', 'events', 'items']) }); } catch { res.status(502).json({ error: 'Eventos esportivos indisponíveis' }); } });
   app.get('/api/v1/embedtv/events', async (_req, res) => { try { res.json({ items: arrayPayload(await embed('/api/events'), ['events', 'items', 'data']) }); } catch { res.status(502).json({ error: 'Eventos EmbedTV indisponíveis' }); } });
   app.get('/api/v1/embedtv/epg', async (_req, res) => { try { res.json({ items: arrayPayload(await embed('/api/epg_all'), ['channels', 'data', 'items']) }); } catch { res.status(502).json({ error: 'EPG EmbedTV indisponível' }); } });

@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "IracemaFlix TV API",
-    "version": "1.1.1",
-    "description": "Catálogos EmbedTV e Embed Canais, TV ao vivo, fontes Xtream configuráveis e EPG XMLTV. Credenciais Xtream são carregadas no servidor e nunca retornadas nas respostas."
+    "version": "1.1.2",
+    "description": "Catálogos EmbedTV e Embed Canais (com snapshot local quando o upstream está inacessível), TV ao vivo, fontes Xtream configuráveis e EPG XMLTV. Em source=live, players Embed Canais correspondentes são anexados aos do Rei sem alterar a prioridade. Credenciais Xtream são carregadas no servidor e nunca retornadas nas respostas."
   },
   "servers": [{ "url": "https://SEU-HOST-TV" }],
   "paths": {
@@ -37,11 +37,11 @@
           { "name": "limit", "in": "query", "schema": { "type": "integer", "maximum": 500 } },
           { "name": "offset", "in": "query", "schema": { "type": "integer", "minimum": 0 } }
         ],
-        "responses": { "200": { "description": "Canais normalizados; inclui fontes parciais/falhas sem credenciais" }, "400": { "description": "Fonte inválida" }, "404": { "description": "Fonte Xtream não configurada" }, "502": { "description": "Fonte upstream indisponível" } }
+        "responses": { "200": { "description": "Canais normalizados; source=live inclui o player alternativo Embed Canais quando há correspondência por nome, sem alterar o player do Rei. Se o site Embed Canais estiver inacessível, usa o snapshot local incluído no pacote." }, "400": { "description": "Fonte inválida" }, "404": { "description": "Fonte Xtream não configurada" }, "502": { "description": "Fonte upstream indisponível" } }
       }
     },
     "/api/v1/channels/{id}": {
-      "get": { "summary": "Consultar canal EmbedTV ou Embed Canais por ID", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "Dados do canal" }, "404": { "description": "Canal inexistente" } } }
+      "get": { "summary": "Consultar canal live, EmbedTV ou Embed Canais por ID", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "Dados do canal; canais live correspondentes incluem opções do Rei e do Embed Canais" }, "404": { "description": "Canal inexistente" } } }
     },
     "/api/v1/sports": {
       "get": { "summary": "Eventos esportivos públicos", "responses": { "200": { "description": "Eventos" }, "502": { "description": "Fonte upstream indisponível" } } }
