@@ -199,7 +199,7 @@ function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FI
   async function embed(pathname) {
     const hit = embedCache.get(pathname); if (hit && hit.expires > Date.now()) return hit.value;
     try {
-      const value = await upstream(embedBase, pathname, { referer: String(config.EMBEDTV_SOURCE_REFERER || 'https://embedtv.cc/') });
+      const value = await upstream(embedBase, pathname, { referer: String(config.EMBEDTV_SOURCE_REFERER || 'https://embedtv.my/') });
       if (cacheMs > 0) embedCache.set(pathname, { value, expires: Date.now() + cacheMs });
       return value;
     } catch (error) {
