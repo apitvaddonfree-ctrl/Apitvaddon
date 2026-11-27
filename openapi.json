@@ -3,7 +3,7 @@
   "info": {
     "title": "IracemaFlix TV API",
     "version": "1.1.2",
-    "description": "Catálogos EmbedTV e Embed Canais (com snapshot local quando o upstream está inacessível), TV ao vivo, fontes Xtream configuráveis e EPG XMLTV. Em source=live, players Embed Canais correspondentes são anexados aos do Rei sem alterar a prioridade. Credenciais Xtream são carregadas no servidor e nunca retornadas nas respostas."
+    "description": "Catálogos EmbedTV e Embed Canais (com snapshot local quando o upstream está inacessível), TV ao vivo, fontes Xtream configuráveis e EPG XMLTV. Para EmbedTV, sourceUrl e errorTxtUrl retornam diretamente o endereço do campo errorTxt do snapshot local, sem requisitá-lo; se estiver ausente ou inválido, usam a URL url do JSON. Páginas de player não são retornadas. A consulta EmbedTV ao upstream tem timeout máximo de 7 segundos. Em source=live, players Embed Canais correspondentes são anexados aos do Rei sem alterar a prioridade. Se o site Embed Canais estiver inacessível, usa o snapshot local incluído no pacote. Credenciais Xtream são carregadas no servidor e nunca retornadas nas respostas."
   },
   "servers": [{ "url": "https://SEU-HOST-TV" }],
   "paths": {
@@ -37,11 +37,11 @@
           { "name": "limit", "in": "query", "schema": { "type": "integer", "maximum": 500 } },
           { "name": "offset", "in": "query", "schema": { "type": "integer", "minimum": 0 } }
         ],
-        "responses": { "200": { "description": "Canais normalizados; source=live inclui o player alternativo Embed Canais quando há correspondência por nome, sem alterar o player do Rei. Se o site Embed Canais estiver inacessível, usa o snapshot local incluído no pacote." }, "400": { "description": "Fonte inválida" }, "404": { "description": "Fonte Xtream não configurada" }, "502": { "description": "Fonte upstream indisponível" } }
+        "responses": { "200": { "description": "source=embedtv retorna em sourceUrl/errorTxtUrl o campo errorTxt do snapshot local sem consultá-lo; se ausente ou inválido, usa a URL url do JSON. Nunca converte páginas de player do upstream em streams. source=live inclui o player alternativo Embed Canais quando há correspondência por nome, sem alterar o player do Rei. Se o site Embed Canais estiver inacessível, usa o snapshot local incluído no pacote." }, "400": { "description": "Fonte inválida" }, "404": { "description": "Fonte Xtream não configurada" }, "502": { "description": "Fonte upstream indisponível" } }
       }
     },
     "/api/v1/channels/{id}": {
-      "get": { "summary": "Consultar canal live, EmbedTV ou Embed Canais por ID", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "Dados do canal; canais live correspondentes incluem opções do Rei e do Embed Canais" }, "404": { "description": "Canal inexistente" } } }
+      "get": { "summary": "Consultar canal live, EmbedTV ou Embed Canais por ID", "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }], "responses": { "200": { "description": "EmbedTV devolve em sourceUrl/errorTxtUrl o endereço do campo errorTxt local sem requisitá-lo; se estiver ausente ou inválido, usa a URL url do JSON. Canais live correspondentes incluem opções do Rei e do Embed Canais" }, "404": { "description": "Canal inexistente" } } }
     },
     "/api/v1/sports": {
       "get": { "summary": "Eventos esportivos públicos", "responses": { "200": { "description": "Eventos" }, "502": { "description": "Fonte upstream indisponível" } } }

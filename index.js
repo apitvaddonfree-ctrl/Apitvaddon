@@ -61,9 +61,11 @@ function parseEpgXml(xml, sourceId) {
   return { channels, programmes };
 }
 function mapStaticChannel(channel) {
+  let errorTxtUrl = '';
+  try { errorTxtUrl = safeHttpUrl(channel.errorTxt || channel.errorTxtUrl, 'URL error.txt').toString(); } catch { /* O fallback JSON continua disponível. */ }
   let sourceUrl = '';
-  try { sourceUrl = safeHttpUrl(channel.url, 'URL do canal').toString(); } catch { /* catálogo ainda pode exibir o canal */ }
-  return { id: String(channel.id || ''), name: String(channel.name || '').slice(0, 200), image: String(channel.image || '').slice(0, 2000), preview: String(channel.preview || '').slice(0, 2000), categories: Array.isArray(channel.categories) ? channel.categories : [], categoryNames: Array.isArray(channel.categoryNames) ? channel.categoryNames.map(String) : [], source: 'embedtv', sourceUrl, playbackMode: 'external-page' };
+  try { sourceUrl = safeHttpUrl(errorTxtUrl || channel.url, 'URL do canal').toString(); } catch { /* catálogo ainda pode exibir o canal */ }
+  return { id: String(channel.id || ''), name: String(channel.name || '').slice(0, 200), image: String(channel.image || '').slice(0, 2000), preview: String(channel.preview || '').slice(0, 2000), categories: Array.isArray(channel.categories) ? channel.categories : [], categoryNames: Array.isArray(channel.categoryNames) ? channel.categoryNames.map(String) : [], source: 'embedtv', errorTxtUrl, sourceUrl, playbackMode: 'direct' };
 }
 function arrayPayload(payload, keys = ['channels', 'events', 'sports', 'results', 'items']) {
   if (Array.isArray(payload)) return payload;
@@ -72,25 +74,75 @@ function arrayPayload(payload, keys = ['channels', 'events', 'sports', 'results'
   if (payload?.data && typeof payload.data === 'object') return arrayPayload(payload.data, keys);
   return [];
 }
-function mapEmbedChannels(payload) {
+function isHlsUrl(value) {
+  try {
+    const url = safeHttpUrl(value, 'URL HLS');
+    return !url.username && !url.password && /\.m3u8$/i.test(url.pathname);
+  } catch { return false; }
+}
+function extractHlsFromErrorTxt(body, baseUrl, contentType = '') {
+  const text = String(body || '').trim();
+  if (!text || /(?:text\/html|application\/xhtml)/i.test(contentType) || /<(?:!doctype\s+html|html\b|iframe\b|script\b)/i.test(text)) return '';
+  const asHls = (value) => {
+    try {
+      const url = new URL(String(value || '').trim(), baseUrl);
+      return isHlsUrl(url.toString()) ? url.toString() : '';
+    } catch { return ''; }
+  };
+  if (text.startsWith('#EXTM3U')) {
+    const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    for (const line of lines) {
+      if (line.startsWith('#')) continue;
+      const candidate = asHls(line);
+      if (candidate) return candidate;
+    }
+    if (/(?:application\/vnd\.apple\.mpegurl|application\/x-mpegurl|audio\/mpegurl)/i.test(contentType) && /#EXT(?:INF|X-TARGETDURATION)/i.test(text)) {
+      try { return safeHttpUrl(baseUrl, 'URL da playlist HLS').toString(); } catch { return ''; }
+    }
+    return '';
+  }
+  const findHls = (value) => {
+    if (typeof value === 'string') return asHls(value);
+    if (Array.isArray(value)) {
+      for (const item of value) { const found = findHls(item); if (found) return found; }
+    } else if (value && typeof value === 'object') {
+      for (const [key, item] of Object.entries(value)) {
+        if (/^(?:url|src|stream|link|playlist|sourceurl)$/i.test(key)) { const found = findHls(item); if (found) return found; }
+      }
+      for (const item of Object.values(value)) { const found = findHls(item); if (found) return found; }
+    }
+    return '';
+  };
+  try { const found = findHls(JSON.parse(text)); if (found) return found; } catch { /* Conteúdo pode ser texto simples. */ }
+  for (const candidate of text.match(/https?:\/\/[^\s"'<>]+/gi) || []) {
+    const found = asHls(candidate.replace(/[),.;\]]+$/, ''));
+    if (found) return found;
+  }
+  if (!/\s/.test(text)) return asHls(text);
+  return '';
+}
+function mapEmbedChannels(payload, fallbackById = new Map()) {
   const categoryNames = new Map((Array.isArray(payload?.categories) ? payload.categories : []).map((item) => [String(item.id), String(item.name || item.title || '')]));
   return arrayPayload(payload).map((channel) => {
     const categories = (Array.isArray(channel.categories) ? channel.categories : []).map((category) => {
       if (category && typeof category === 'object') return String(category.name || category.title || category.id || '');
       return categoryNames.get(String(category)) || String(category || '');
     }).filter(Boolean);
+    const id = String(channel.id || '');
+    const fallback = fallbackById.get(id);
     const mapped = mapStaticChannel({
-      id: channel.id,
-      name: channel.name || channel.title,
-      image: channel.image || channel.logo,
-      preview: channel.preview,
-      categories,
-      categoryNames: categories,
-      url: channel.url || channel.sourceUrl || channel.href
+      id,
+      name: channel.name || channel.title || fallback?.name,
+      image: channel.image || channel.logo || fallback?.image,
+      preview: channel.preview || fallback?.preview,
+      categories: categories.length ? categories : (fallback?.categories || []),
+      categoryNames: categories.length ? categories : (fallback?.categoryNames || []),
+      errorTxt: fallback?.errorTxtUrl || '',
+      url: fallback?.sourceUrl || ''
     });
-    const normalized = `${mapped.id} ${mapped.name}`.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    if (!mapped.id || !mapped.sourceUrl || /\b(playboy|sexyhot)\b/.test(normalized)) return null;
-    return { ...mapped, playbackMode: /\.m3u8(?:$|\?)/i.test(mapped.sourceUrl) ? 'hls' : 'external-page' };
+    const normalized = `${mapped.id} ${mapped.name || fallback?.name || ''}`.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (!mapped.id || !fallback?.sourceUrl || !mapped.sourceUrl || /\b(playboy|sexyhot)\b/.test(normalized)) return null;
+    return { ...mapped, sourceUrl: fallback.sourceUrl, playbackMode: 'direct' };
   }).filter(Boolean);
 }
 
@@ -150,14 +202,20 @@ function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FI
   const localChannelsFile = resolveChannelsFile(config, channelsFile);
   const channelData = readChannelData(localChannelsFile);
   const staticChannels = channelData.channels.map(mapStaticChannel).filter((c) => c.id);
+  const embedFallbackById = new Map(channelData.channels.map((channel) => {
+    const mapped = mapStaticChannel(channel);
+    return [mapped.id, { ...mapped, playbackMode: 'direct' }];
+  }).filter(([id, channel]) => id && channel.sourceUrl));
   const staticCategories = Array.isArray(channelData.categories) ? channelData.categories : [];
   const epgSources = loadEpgSources(epgConfigFile);
   const liveBase = safeHttpUrl(config.LIVE_TV_API_BASE, 'LIVE_TV_API_BASE').toString().replace(/\/+$/, '');
   const embedBase = safeHttpUrl(config.EMBEDTV_API_BASE, 'EMBEDTV_API_BASE').toString().replace(/\/+$/, '');
   const timeoutMs = clampInt(config.DIRECT_PROVIDER_API_TIMEOUT_MS || config.PROVIDER_SOURCE_TIMEOUT_MS, 25000, 1000, 120000);
+  const embedTimeoutMs = clampInt(config.EMBEDTV_REQUEST_TIMEOUT_MS, 7000, 1000, 7000);
   const embedCanaisUrl = safeHttpUrl(config.EMBED_CANAIS_HOME || EMBED_CANAIS_HOME_DEFAULT, 'EMBED_CANAIS_HOME').toString();
   const embedCanaisTimeoutMs = clampInt(config.EMBED_CANAIS_TIMEOUT_MS, 25000, 1000, 120000);
   const cacheMs = clampInt(config.LIVE_TV_CACHE_MS, 300000, 0, 3600000);
+  const embedResolveCacheMs = clampInt(config.EMBEDTV_RESOLVE_CACHE_MS || config.LIVE_TV_RESOLVE_CACHE_MS, 600000, 0, 3600000);
   const configuredXtreamSources = xtreamSources == null
     ? loadXtreamSources({ appConfig: config })
     : xtreamSources.map(normalizeXtreamSource).filter(Boolean);
@@ -173,6 +231,7 @@ function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FI
   } catch { /* Logging must never interrupt startup. */ }
   let liveCache = new Map();
   let embedCache = new Map();
+  let embedResolveCache = new Map();
   let epgCache = null;
   let epgInFlight = null;
 
@@ -180,10 +239,10 @@ function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FI
   configureHttp(app, 'iracemaflix-tv-api', { rateLimit: 60 });
   app.get('/openapi.json', (_req, res) => res.type('application/json').sendFile(path.join(__dirname, 'openapi.json')));
 
-  async function upstream(base, endpoint, headers = {}) {
+  async function upstream(base, endpoint, headers = {}, requestTimeoutMs = timeoutMs) {
     const url = new URL(endpoint, `${base}/`);
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs); timer.unref?.();
+    const timer = setTimeout(() => controller.abort(), requestTimeoutMs); timer.unref?.();
     try {
       const response = await fetchImpl(url, { headers: { accept: 'application/json, text/plain, */*', 'user-agent': 'IracemaTV/1.5.5', ...headers }, signal: controller.signal });
       if (!response.ok) throw new Error(`upstream HTTP ${response.status}`);
@@ -199,7 +258,7 @@ function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FI
   async function embed(pathname) {
     const hit = embedCache.get(pathname); if (hit && hit.expires > Date.now()) return hit.value;
     try {
-      const value = await upstream(embedBase, pathname, { referer: String(config.EMBEDTV_SOURCE_REFERER || 'https://embedtv.my/') });
+      const value = await upstream(embedBase, pathname, { referer: String(config.EMBEDTV_SOURCE_REFERER || 'https://embedtv.my/') }, embedTimeoutMs);
       if (cacheMs > 0) embedCache.set(pathname, { value, expires: Date.now() + cacheMs });
       return value;
     } catch (error) {
@@ -212,7 +271,20 @@ function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FI
     }
   }
   async function getEmbedChannels() {
-    return mapEmbedChannels(await embed('/api/channels'));
+    const mapped = mapEmbedChannels(await embed('/api/channels'), embedFallbackById);
+    return mapped.length ? mapped : mapEmbedChannels(channelData, embedFallbackById);
+  }
+  async function resolveLocalEmbedChannel(id) {
+    const cacheKey = String(id);
+    const hit = embedResolveCache.get(cacheKey);
+    if (hit && hit.expires > Date.now()) return hit.value;
+    const fallback = embedFallbackById.get(String(id));
+    if (!fallback) return null;
+    const normalized = `${fallback.id} ${fallback.name}`.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (/\b(playboy|sexyhot)\b/.test(normalized)) return null;
+    const value = { ...fallback, playbackMode: 'direct' };
+    if (embedResolveCacheMs > 0) embedResolveCache.set(cacheKey, { value, expires: Date.now() + embedResolveCacheMs });
+    return value;
   }
   async function getEmbedCanaisChannels() {
     return cached('embedcanais-channels', async () => {
@@ -426,6 +498,8 @@ function createApp({ fetchImpl = globalThis.fetch, appConfigFile = APP_CONFIG_FI
         const item = (await getEmbedCanaisChannels()).find((channel) => channel.id === id);
         return item ? res.json(item) : res.status(404).json({ error: 'Canal não encontrado', requestId: req.requestId });
       }
+      const embedLocalItem = await resolveLocalEmbedChannel(id);
+      if (embedLocalItem) return res.json(embedLocalItem);
       const liveChannels = await getLiveChannels().catch(() => []);
       const liveItem = liveChannels.find((channel) => channel.id === id);
       if (liveItem) {
